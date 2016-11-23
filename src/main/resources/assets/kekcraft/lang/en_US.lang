@@ -1,0 +1,27 @@
+language.name=English
+language.region=US
+language.code=en_US
+
+itemGroup.KekCraft=KekCraft
+
+tile.kekcraft_ElectricFurnace.name=Electric Furnace
+tile.kekcraft_CrankEngine.name=Crank Engine
+tile.kekcraft_Oxidizer.name=Oxidizer
+tile.kekcraft_ManualCrusher.name=Manual Crusher
+
+tile.kekcraft_OreMagnesium.name=Magnesium Ore
+tile.kekcraft_OreAluminum.name=Aluminum Ore
+
+item.kekcraft_DustIron.name=Iron Dust
+item.kekcraft_DustSteel.name=Steel Dust
+item.kekcraft_DustMagnesium.name=Magnesium Dust
+item.kekcraft_DustAluminum.name=Aluminum Dust
+item.kekcraft_DustIronOxide.name=Iron Oxide
+
+item.kekcraft_IngotSteel.name=Steel Ingot
+item.kekcraft_IngotAluminum.name=Aluminum Ingot
+
+item.kekcraft_GearIron.name=Iron Gear
+
+item.kekcraft_MachineCore.name=Machine Core
+item.kekcraft_DustThermite.name=Thermite

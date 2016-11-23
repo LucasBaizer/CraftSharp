@@ -1,0 +1,11 @@
+bin
+build
+config
+crash-reports
+eclipse
+logs
+mods
+resourcepacks
+saves
+
+usernamecache.json
