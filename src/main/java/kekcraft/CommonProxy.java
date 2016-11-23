@@ -27,6 +27,7 @@ import kekcraft.items.DustIronOxide;
 import kekcraft.items.DustMagnesium;
 import kekcraft.items.DustSteel;
 import kekcraft.items.DustThermite;
+import kekcraft.items.GearIron;
 import kekcraft.items.IngotAluminum;
 import kekcraft.items.IngotSteel;
 import kekcraft.items.MachineCore;

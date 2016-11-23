@@ -1,7 +1,7 @@
-package kekcraft;
+package kekcraft.items;
 
+import kekcraft.Tabs;
 import kekcraft.api.GameFactory;
-import kekcraft.items.KekCraftItem;
 
 public class GearIron extends KekCraftItem {
 	public GearIron(GameFactory factory) {
