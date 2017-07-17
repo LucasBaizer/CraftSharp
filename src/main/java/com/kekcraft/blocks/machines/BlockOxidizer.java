@@ -84,7 +84,7 @@ public class BlockOxidizer extends ElectricMachine {
 			setItemSlots(new int[] { 0, 1 });
 			setOutputSlots(new int[] { 2 });
 
-			addRecipe(new OxidizerRecipe(new ItemStack(KekCraft.factory.getItem("DustIron"), 4),
+			addRecipe(new OxidizerRecipe(new ItemStack(KekCraft.factory.getItem("DustIron")),
 					new ItemStack(KekCraft.factory.getItem("DustIronOxide"))));
 		}
 

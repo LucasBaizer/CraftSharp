@@ -93,7 +93,21 @@ public class CommonProxy {
 		GameRegistry.registerWorldGenerator(new OreGenerationHandler(), 0);
 	}
 
-	public void postInit(FMLPostInitializationEvent e) {}
+	public void postInit(FMLPostInitializationEvent e) {
+		try {
+			Class<?> registry = Class.forName("exnihilo.registries.SieveRegistry");
+			Block source = GameRegistry.findBlock("exnihilo", "dust");
+			Item output = factory.getItem("DustMagnesium");
+			int meta = 0;
+			int rarity = 20;
+			registry.getDeclaredMethod("register", Block.class, Item.class, int.class, int.class).invoke(null, source,
+					output, meta, rarity);
+		} catch (ClassNotFoundException ex) {
+			System.out.println("ExNihilo is not present, will not register magnesium dust in sieve.");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 
 	public void serverLoad(FMLServerStartingEvent event) {
 		event.registerServerCommand(new DoxCommand());
