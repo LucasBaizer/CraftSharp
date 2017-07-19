@@ -13,18 +13,20 @@ import net.minecraft.nbt.NBTTagCompound;
 public class CircuitFabricatorRecipe implements IMachineRecipe {
 	private static final long serialVersionUID = 428852275461702654L;
 
-	private transient ItemStack input;
+	private transient ItemStack inputA;
+	private transient ItemStack inputB;
 	private transient ItemStack output;
 
-	public CircuitFabricatorRecipe(ItemStack input, Item circuit) {
-		this.input = input;
+	public CircuitFabricatorRecipe(ItemStack inputA, ItemStack inputB, Item circuit) {
+		this.inputA = inputA;
+		this.inputB = inputB;
 		this.output = new ItemStack(circuit);
 	}
 
 	@Override
 	public boolean satifies(ItemStack[] slots) {
 		return has(slots[0], KekCraft.factory.getItem("RefinedSilicon")) && slots[1] != null
-				&& slots[1].getItem() == input.getItem() && has(slots[2], KekCraft.factory.getItem("RefinedSilicon"));
+				&& slots[1].getItem() == inputA.getItem() && slots[2].getItem() == inputB.getItem();
 	}
 
 	private boolean has(ItemStack itemStack, Item item) {
@@ -34,7 +36,8 @@ public class CircuitFabricatorRecipe implements IMachineRecipe {
 	@Override
 	public boolean isValidElementOfRecipe(ItemStack element, int index) {
 		return ((index == 0 || index == 2) && element.getItem() == KekCraft.factory.getItem("RefinedSilicon"))
-				|| (index == 1 && input.getItem() == element.getItem());
+				|| (index == 1 && inputA.getItem() == element.getItem())
+				|| (index == 2 && inputB.getItem() == element.getItem());
 	}
 
 	@Override
@@ -44,7 +47,7 @@ public class CircuitFabricatorRecipe implements IMachineRecipe {
 
 	@Override
 	public ItemStack getInput(int slot) {
-		return (slot == 0 || slot == 2) ? new ItemStack(KekCraft.factory.getItem("RefinedSilicon")) : input;
+		return slot == 0 ? new ItemStack(KekCraft.factory.getItem("RefinedSilicon")) : (slot == 1 ? inputA : inputB);
 	}
 
 	@Override
@@ -69,7 +72,8 @@ public class CircuitFabricatorRecipe implements IMachineRecipe {
 
 	@Override
 	public void writeToNBT(NBTTagCompound nbt) {
-		write(nbt, input, "Input");
+		write(nbt, inputA, "InputA");
+		write(nbt, inputB, "InputB");
 		write(nbt, output, "Output");
 	}
 
@@ -81,7 +85,8 @@ public class CircuitFabricatorRecipe implements IMachineRecipe {
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
-		input = read(nbt, "Input");
+		inputA = read(nbt, "InputA");
+		inputB = read(nbt, "InputB");
 		output = read(nbt, "Output");
 	}
 

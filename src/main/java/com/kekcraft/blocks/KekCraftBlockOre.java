@@ -9,7 +9,7 @@ import net.minecraft.block.BlockOre;
 
 public class KekCraftBlockOre extends BlockOre {
 	public static final List<KekCraftBlockOre> BLOCKS = new ArrayList<KekCraftBlockOre>();
-
+	
 	public static final int WOOD = 0;
 	public static final int STONE = 1;
 	public static final int IRON = 2;

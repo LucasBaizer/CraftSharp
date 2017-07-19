@@ -33,7 +33,6 @@ public class RecipeHandler {
 				new ShapelessOreRecipe(new ItemStack(steelDust), coal, coal, coal, coal, "dustIron", "dustIron"));
 		GameRegistry.addRecipe(new ShapedOreRecipe(factory.getItem("GearIron"), " A ", "ABA", " A ", 'A', iron_ingot,
 				'B', "ingotAluminum"));
-		GameRegistry.addRecipe(new ShapedOreRecipe(machineCore, " A ", "A A", " A ", 'A', "ingotSteel"));
 		GameRegistry.addRecipe(new ItemStack(factory.getBlock("ElectricFurnace")), "ABA", "BCB", "ABA", 'A', iron_ingot,
 				'B', stone, 'C', machineCore);
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(factory.getBlock("Oxidizer")), " A ", "BCB", "DED",

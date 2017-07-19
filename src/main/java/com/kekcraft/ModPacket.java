@@ -43,7 +43,12 @@ public class ModPacket {
 				int z = in.readInt();
 
 				MachineTileEntity entity = (MachineTileEntity) getTileEntityByID(x, y, z, world);
-				entity.read(in);
+
+				// checks to make sure entity was not destroyed between packet
+				// send and packet receive
+				if (entity != null) {
+					entity.read(in);
+				}
 				in.close();
 			}
 		} catch (NullPointerException e) {
@@ -53,7 +58,7 @@ public class ModPacket {
 
 	public static void processPacketOnServerSide(ByteBuf payload, Side parSide) {
 		if (parSide == Side.SERVER) {
-			// nothing send to server my client
+			// nothing sent to server by client
 		}
 	}
 

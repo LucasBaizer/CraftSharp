@@ -12,6 +12,7 @@ import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 import com.kekcraft.api.ui.Machine;
 import com.kekcraft.api.ui.UIHandler;
+import com.kekcraft.blocks.KekCraftBlock;
 import com.kekcraft.blocks.KekCraftBlockOre;
 import com.kekcraft.blocks.OreGenerationHandler;
 import com.kekcraft.blocks.machines.BlockCircuitFabricator;
@@ -62,9 +63,12 @@ public class CommonProxy {
 		Tabs.initialize(factory);
 		try {
 			instantiate("com.kekcraft.items", "KekCraftItem");
-			instantiate("com.kekcraft.blocks", "KekCraftBlockOre", "OreGenerationHandler");
+			instantiate("com.kekcraft.blocks", "KekCraftBlockOre", "KekCraftBlock", "OreGenerationHandler");
 			for (Item item : KekCraftItem.ITEMS) {
 				GameRegistry.registerItem(item, item.getUnlocalizedName().substring(5));
+			}
+			for (Block block : KekCraftBlock.BLOCKS) {
+				GameRegistry.registerBlock(block, "kekcraft_" + block.getUnlocalizedName().substring(5));
 			}
 			for (Block block : KekCraftBlockOre.BLOCKS) {
 				GameRegistry.registerBlock(block, "kekcraft_" + block.getUnlocalizedName().substring(5));

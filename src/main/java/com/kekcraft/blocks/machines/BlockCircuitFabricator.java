@@ -3,6 +3,7 @@ package com.kekcraft.blocks.machines;
 import java.awt.Dimension;
 
 import com.kekcraft.KekCraft;
+import com.kekcraft.RecipeHandler;
 import com.kekcraft.Tabs;
 import com.kekcraft.api.GameFactory;
 import com.kekcraft.api.ui.ElectricMachine;
@@ -17,6 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class BlockCircuitFabricator extends ElectricMachine {
 	public BlockCircuitFabricator(GameFactory factory) {
@@ -24,6 +26,8 @@ public class BlockCircuitFabricator extends ElectricMachine {
 				new ResourceLocation(KekCraft.MODID, "textures/ui/CircuitFabricator.png"));
 
 		factory.initializeBlock(this, "Circuit Fabricator", "CircuitFabricator", Tabs.DEFAULT, "CircuitFabricator");
+		RecipeHandler.RECIPES.add(new ShapedOreRecipe(new ItemStack(this), "ABA", "CDC", "AEA", 'A', "ingotAluminum",
+				'B', "blockSilicon", 'C', "gearIron", 'D', KekCraft.factory.getItem("MachineCore"), 'E', "ingotGold"));
 		setWindowDimensions(new Dimension(-1, 189));
 	}
 
@@ -55,7 +59,7 @@ public class BlockCircuitFabricator extends ElectricMachine {
 				targetHeight);
 		ui.drawTooltip(ui.left + 26, ui.top + 29, barWidth, barHeight, (int) e.getEnergy().getEnergyStored() + " RF");
 
-		int arrowWidth = 38;
+		int arrowWidth = 43;
 		int arrowHeight = 16;
 		if (e.getCurrentCookTime() > 0) {
 			int width = (int) (((e.getCookTime() - e.getCurrentCookTime()) * arrowWidth / (double) e.getCookTime())
@@ -65,7 +69,7 @@ public class BlockCircuitFabricator extends ElectricMachine {
 			}
 			ui.drawUV(ui.left + 79, ui.top + 57, 176, 97, width, arrowHeight);
 			ui.drawTooltip(ui.left + 79, ui.top + 57, arrowWidth, arrowHeight,
-					(int) ((e.getCurrentCookTime() / (double) e.getCookTime()) * 100) + "%");
+					100 - (int) ((e.getCurrentCookTime() / (double) e.getCookTime()) * 100) + "%");
 		} else {
 			ui.drawTooltip(ui.left + 79, ui.top + 57, arrowWidth, arrowHeight, "0%");
 		}
@@ -82,7 +86,24 @@ public class BlockCircuitFabricator extends ElectricMachine {
 			getEnergy().setMaxTransfer(128);
 			getEnergy().setEnergyStored(KekCraft.ENERGY_MODE_DEV ? 100000 : 0);
 
-			addRecipe(new CircuitFabricatorRecipe(new ItemStack(Items.redstone), Items.diamond));
+			addRecipe(new CircuitFabricatorRecipe(new ItemStack(Items.redstone),
+					new ItemStack(KekCraft.factory.getItem("RefinedSilicon")),
+					KekCraft.factory.getItem("CircuitRedstone")));
+
+			addRecipe(new CircuitFabricatorRecipe(new ItemStack(Items.iron_ingot),
+					new ItemStack(KekCraft.factory.getItem("CircuitRedstone")),
+					KekCraft.factory.getItem("CircuitIron")));
+
+			addRecipe(new CircuitFabricatorRecipe(new ItemStack(Items.gold_ingot),
+					new ItemStack(KekCraft.factory.getItem("CircuitIron")), KekCraft.factory.getItem("CircuitGold")));
+
+			addRecipe(new CircuitFabricatorRecipe(new ItemStack(Items.diamond),
+					new ItemStack(KekCraft.factory.getItem("CircuitGold")),
+					KekCraft.factory.getItem("CircuitDiamond")));
+
+			addRecipe(new CircuitFabricatorRecipe(new ItemStack(Items.emerald),
+					new ItemStack(KekCraft.factory.getItem("CircuitDiamond")),
+					KekCraft.factory.getItem("CircuitEmerald")));
 		}
 
 		@Override

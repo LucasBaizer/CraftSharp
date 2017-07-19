@@ -67,7 +67,7 @@ public class BlockOxidizer extends ElectricMachine {
 			}
 			ui.drawUV(ui.left + 78, ui.top + 34, 176, 74, width, arrowHeight);
 			ui.drawTooltip(ui.left + 78, ui.top + 34, arrowWidth, arrowHeight,
-					Math.abs(e.getCurrentCookTime() - 200) / e.getCookTime() + "%");
+					(int) (Math.abs(e.getCurrentCookTime() - 200) / (double) e.getCookTime()) + "%");
 		} else {
 			ui.drawTooltip(ui.left + 78, ui.top + 34, arrowWidth, arrowHeight, "0%");
 		}
@@ -85,7 +85,7 @@ public class BlockOxidizer extends ElectricMachine {
 			setOutputSlots(new int[] { 2 });
 
 			addRecipe(new OxidizerRecipe(new ItemStack(KekCraft.factory.getItem("DustIron")),
-					new ItemStack(KekCraft.factory.getItem("DustIronOxide"))));
+					new ItemStack(KekCraft.factory.getItem("DustIronOxide"), 2)));
 		}
 
 		@Override

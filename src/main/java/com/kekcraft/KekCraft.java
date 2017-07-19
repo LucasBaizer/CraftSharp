@@ -15,7 +15,7 @@ import cpw.mods.fml.common.network.FMLEventChannel;
 
 @Mod(modid = KekCraft.MODID, name = KekCraft.NAME, version = KekCraft.VERSION, dependencies = "after:exnihilo")
 public class KekCraft implements ForgeMod {
-	public static final boolean ENERGY_MODE_DEV = false;
+	public static final boolean ENERGY_MODE_DEV = true;
 	public static final String NAME = "KekCraft";
 	public static final String MODID = "kekcraft";
 	public static final String VERSION = "1.0";

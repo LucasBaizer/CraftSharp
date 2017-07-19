@@ -95,7 +95,7 @@ public class BlockHighTemperatureAlloyFurnace extends FuelMachine {
 					new ItemStack(KekCraft.factory.getItem("Silicon")), -1));
 			addRecipe(new DualSlotRecipe(new ItemStack(KekCraft.factory.getItem("Silicon")),
 					new ItemStack(KekCraft.factory.getItem("Silicon")),
-					new ItemStack(KekCraft.factory.getItem("RefinedSilicon")), -1));
+					new ItemStack(KekCraft.factory.getItem("RefinedSilicon"), 2), -1));
 		}
 
 		@Override
