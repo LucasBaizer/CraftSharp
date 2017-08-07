@@ -9,7 +9,7 @@ import net.minecraft.item.Item;
 
 public class BlockOreMagnesium extends KekCraftBlockOre {
 	public BlockOreMagnesium() {
-		super("OreMagnesium", 8, 16, 0, 64, STONE);
+		super("OreMagnesium", 8, 16, 0, 64, KekCraftBlock.STONE);
 		DictionaryHandler.register("oreMagnesium", this);
 
 		setHardness(1.5f);

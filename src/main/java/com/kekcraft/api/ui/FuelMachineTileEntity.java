@@ -2,12 +2,15 @@ package com.kekcraft.api.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map.Entry;
 
 import com.kekcraft.ModPacket;
 
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public abstract class FuelMachineTileEntity extends MachineTileEntity {
 	public FuelMachineTileEntity(int slots, int tickUpdateRate) {
@@ -79,6 +82,7 @@ public abstract class FuelMachineTileEntity extends MachineTileEntity {
 				IMachineRecipe recipe = getNextRecipe();
 				if (recipe != null) {
 					beginSmeltNextItem();
+					onItemConsumeStart();
 				}
 			}
 			if (isBurningRecipe()) {
@@ -88,7 +92,6 @@ public abstract class FuelMachineTileEntity extends MachineTileEntity {
 					ModPacket.sendTileEntityUpdate(this);
 				} else {
 					currentCookTime--;
-					currentBurnTime--;
 
 					if (enablesAutomaticUpdates()) {
 						cookTicks++;
@@ -99,10 +102,22 @@ public abstract class FuelMachineTileEntity extends MachineTileEntity {
 					}
 					if (currentCookTime == 0) {
 						smeltItemWhenDone();
+						if (getNextRecipe() == null) {
+							onSmeltingFinished();
+						}
+					}
+				}
+			}
+			if (currentBurnTime > 0) {
+				currentBurnTime--;
+				if (enablesAutomaticUpdates()) {
+					if (currentBurnTime % tickUpdateRate == 0) {
+						ModPacket.sendTileEntityUpdate(this);
 					}
 				}
 			}
 		}
+
 	}
 
 	@Override
@@ -135,10 +150,17 @@ public abstract class FuelMachineTileEntity extends MachineTileEntity {
 		burnTime = in.readInt();
 		currentCookTime = in.readInt();
 		cookTime = in.readInt();
+
+		for (int i = 0; i < faces.size(); i++) {
+			ForgeDirection dir = ForgeDirection.values()[in.readInt()];
+			FaceType face = FaceType.values()[in.readInt()];
+			faces.put(dir, face);
+		}
 	}
 
 	@Override
 	public void write(ByteBufOutputStream out) throws IOException {
+		out.writeInt(Minecraft.getMinecraft().theWorld.provider.dimensionId);
 		out.writeInt(xCoord);
 		out.writeInt(yCoord);
 		out.writeInt(zCoord);
@@ -147,5 +169,10 @@ public abstract class FuelMachineTileEntity extends MachineTileEntity {
 		out.writeInt(getBurnTime());
 		out.writeInt(getCurrentCookTime());
 		out.writeInt(getCookTime());
+
+		for (Entry<ForgeDirection, FaceType> entry : faces.entrySet()) {
+			out.writeInt(entry.getKey().ordinal());
+			out.writeInt(entry.getValue().ordinal());
+		}
 	}
 }

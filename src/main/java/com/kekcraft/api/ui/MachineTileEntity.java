@@ -3,7 +3,9 @@ package com.kekcraft.api.ui;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.SerializationUtils;
 
@@ -16,9 +18,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public abstract class MachineTileEntity extends TileEntity implements ISidedInventory, SerializableEntity {
 	private boolean enableAutomaticUpdates = true;
+	private boolean changeMeta;
 	protected ItemStack[] slots;
 	protected int[] itemSlots;
 	protected int[] outputSlots;
@@ -28,17 +32,44 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 	protected String inventoryName;
 	protected long cookTicks = 0;
 	protected List<IMachineRecipe> validRecipes = new ArrayList<IMachineRecipe>();
+	public HashMap<ForgeDirection, FaceType> faces = new HashMap<ForgeDirection, FaceType>();
+	public MachineUI ui;
 
 	public MachineTileEntity(int slots, int tickUpdateRate) {
 		this.slots = new ItemStack[slots];
 		this.tickUpdateRate = tickUpdateRate;
+
+		for (ForgeDirection dir : ForgeDirection.values()) {
+			faces.put(dir, FaceType.NONE);
+		}
 	}
 
-	protected void onSmeltingStopped() {}
+	public void setChangeMeta(boolean meta) {
+		this.changeMeta = meta;
+	}
 
-	protected void onItemConsumeStart() {}
+	protected void onSmeltingStopped() {
+		if (changeMeta) {
+			modifyMeta(-6);
+		}
+	}
 
-	protected void onItemSmelted(IMachineRecipe item) {}
+	protected void onSmeltingFinished() {
+	}
+
+	protected void onItemConsumeStart() {
+		if (changeMeta) {
+			modifyMeta(6);
+		}
+	}
+
+	private void modifyMeta(int x) {
+		worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord,
+				worldObj.getBlockMetadata(xCoord, yCoord, zCoord) + x, 2);
+	}
+
+	protected void onItemSmelted(IMachineRecipe item) {
+	}
 
 	protected void reset() {
 		currentCookTime = 0;
@@ -57,6 +88,8 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 			ModPacket.sendTileEntityUpdate(this);
 		}
 	}
+
+	public Runnable onUISet;
 
 	public int[] getOutputSlots() {
 		return outputSlots;
@@ -229,7 +262,8 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 
 	}
 
-	public void onInputSlotExhausted(int slot) {}
+	public void onInputSlotExhausted(int slot) {
+	}
 
 	public void smeltNextItem() {
 		try {
@@ -247,6 +281,7 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 				}
 			}
 		} catch (NullPointerException e) {
+			System.out.println("NullPointerException thrown when finishing smelt!");
 			return;
 		}
 	}
@@ -308,13 +343,19 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 		NBTTagList tagList = tagCompound.getTagList("Items", 10);
 		this.slots = new ItemStack[this.getSizeInventory()];
 
-		for (int i = 0; i < tagList.tagCount(); ++i) {
+		for (int i = 0; i < tagList.tagCount(); i++) {
 			NBTTagCompound tabCompound1 = tagList.getCompoundTagAt(i);
 			byte byte0 = tabCompound1.getByte("Slot");
 
 			if (byte0 >= 0 && byte0 < slots.length) {
 				slots[byte0] = ItemStack.loadItemStackFromNBT(tabCompound1);
 			}
+		}
+
+		NBTTagList faces = tagCompound.getTagList("Faces", 10);
+		for (int i = 0; i < faces.tagCount(); i++) {
+			NBTTagCompound tag = faces.getCompoundTagAt(i);
+			this.faces.put(ForgeDirection.valueOf(tag.getString("Direction")), FaceType.valueOf(tag.getString("Face")));
 		}
 
 		cookTime = tagCompound.getInteger("CookTime");
@@ -352,7 +393,6 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 		}
 
 		NBTTagList tagList = new NBTTagList();
-
 		for (int i = 0; i < slots.length; ++i) {
 			if (slots[i] != null) {
 				NBTTagCompound tagCompound1 = new NBTTagCompound();
@@ -361,8 +401,17 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 				tagList.appendTag(tagCompound1);
 			}
 		}
-
 		tagCompound.setTag("Items", tagList);
+
+		NBTTagList faceList = new NBTTagList();
+		for (Entry<ForgeDirection, FaceType> entry : faces.entrySet()) {
+			NBTTagCompound tag = new NBTTagCompound();
+			tag.setString("Direction", entry.getKey().toString());
+			tag.setString("Face", entry.getValue().toString());
+			faceList.appendTag(tag);
+		}
+
+		tagCompound.setTag("Faces", faceList);
 
 		if (this.hasCustomInventoryName()) {
 			tagCompound.setString("CustomName", getInventoryName());

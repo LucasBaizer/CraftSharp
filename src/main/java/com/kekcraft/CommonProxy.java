@@ -63,7 +63,8 @@ public class CommonProxy {
 		Tabs.initialize(factory);
 		try {
 			instantiate("com.kekcraft.items", "KekCraftItem");
-			instantiate("com.kekcraft.blocks", "KekCraftBlockOre", "KekCraftBlock", "OreGenerationHandler");
+			instantiate("com.kekcraft.blocks", "KekCraftBlockOre", "ParticleFX", "KekCraftBlock",
+					"OreGenerationHandler");
 			for (Item item : KekCraftItem.ITEMS) {
 				GameRegistry.registerItem(item, item.getUnlocalizedName().substring(5));
 			}

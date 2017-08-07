@@ -15,11 +15,29 @@ public class GameFactory {
 	}
 
 	public Block getBlock(String name) {
-		return (Block) objects.get(name);
+		Block block = (Block) objects.get(name);
+		if (block == null) {
+			System.out.println("WARNING: Attempting to retreive a null block from the GameFactory!");
+			printStackTrace(3);
+		}
+		return block;
 	}
 
 	public Item getItem(String name) {
-		return (Item) objects.get(name);
+		Item item = (Item) objects.get(name);
+		if (item == null) {
+			System.out.println("WARNING: Attempting to retreive a null item from the GameFactory!");
+			printStackTrace(3);
+		}
+		return item;
+	}
+
+	private void printStackTrace(int frames) {
+		System.out.println("Current stacktrace (to " + frames + " frames): ");
+		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+		for (int i = 2; i < frames + 2; i++) {
+			System.out.println(stack[i]);
+		}
 	}
 
 	public Item initializeItem(Item item, String name, String unlocalized, CreativeTabs tab, String icon) {

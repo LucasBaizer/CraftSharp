@@ -1,33 +1,50 @@
 package com.kekcraft.blocks.machines;
 
+import static net.minecraft.init.Items.lava_bucket;
+
 import java.awt.Dimension;
 
 import com.kekcraft.KekCraft;
+import com.kekcraft.RecipeHandler;
 import com.kekcraft.Tabs;
 import com.kekcraft.api.GameFactory;
+import com.kekcraft.api.ParticleColor;
 import com.kekcraft.api.ui.FuelMachine;
 import com.kekcraft.api.ui.FuelMachineFuel;
 import com.kekcraft.api.ui.FuelMachineTileEntity;
 import com.kekcraft.api.ui.MachineContainer;
 import com.kekcraft.api.ui.MachineTileEntity;
-import com.kekcraft.api.ui.MachineUI;
+import com.kekcraft.api.ui.UIScreen;
 
+import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class BlockHighTemperatureAlloyFurnace extends FuelMachine {
 	public BlockHighTemperatureAlloyFurnace(GameFactory factory) {
-		super(Material.rock, KekCraft.modInstance, 4,
-				new ResourceLocation(KekCraft.MODID, "textures/ui/HighTemperatureAlloyFurnace.png"));
+		super(Material.rock, KekCraft.modInstance, 4, "HighTemperatureAlloyFurnace");
 
 		factory.initializeBlock(this, "High-Temperature Alloy Furnace", "HighTemperatureAlloyFurnace", Tabs.DEFAULT,
 				"HighTemperatureAlloyFurnace");
 		setWindowDimensions(new Dimension(-1, 189));
+
+		RecipeHandler.FUTURES.add(new Runnable() {
+			@Override
+			public void run() {
+				GameRegistry.addRecipe(new ShapedOreRecipe(
+						new ItemStack(KekCraft.factory.getBlock("HighTemperatureAlloyFurnace")), "AAA", "BCB", "DED",
+						'A', lava_bucket, 'B', "gearIron", 'C', KekCraft.factory.getItem("MachineCore"), 'D',
+						KekCraft.factory.getItem("IngotSteel"), 'E', KekCraft.factory.getBlock("BlockSteel")));
+			}
+		});
+
+		initializeSpecialIcons();
+		setParticleColor(ParticleColor.RED);
 	}
 
 	@Override
@@ -42,43 +59,16 @@ public class BlockHighTemperatureAlloyFurnace extends FuelMachine {
 		container.drawMinecraftInventory(8, 107);
 		container.addSlotToContainer(container.createSlot(0, 56, 46));
 		container.addSlotToContainer(container.createSlot(1, 56, 69));
-		container.addSlotToContainer(new Slot(container.getTileEntity(), 2, 27, 58 - 12) {
+
+		Slot slot = new Slot(container.getTileEntity(), 2, 27, 58 - 12) {
 			@Override
 			public boolean isItemValid(ItemStack item) {
 				return item.getItem() == KekCraft.factory.getItem("DustThermite");
 			}
-		});
+		};
+		slot.setBackgroundIcon(KekCraft.factory.getItem("DustThermite").getIconFromDamage(0));
+		container.addSlotToContainer(slot);
 		container.addSlotToContainer(container.createOutputSlot(3, 135, 58));
-	}
-
-	@Override
-	public void drawToUI(MachineUI ui, MachineTileEntity entity) {
-		BlockHighTemperatureAlloyFurnaceTileEntity e = (BlockHighTemperatureAlloyFurnaceTileEntity) entity;
-
-		int flameWidth = 13;
-		int flameHeight = 13;
-		int arrowWidth = 41;
-		int arrowHeight = 16;
-		if (e.getCurrentBurnTime() > 0) {
-			int height = (int) ((e.getCurrentBurnTime() / (double) e.getBurnTime()) * flameHeight);
-
-			ui.drawUV(ui.left + 8, ui.top + 59 + (flameHeight - height), 176, 23 + (flameHeight - height), flameWidth,
-					height);
-			ui.drawTooltip(ui.left + 8, ui.top + 59, flameWidth, flameHeight,
-					(int) ((e.getCurrentBurnTime() / (double) e.getBurnTime()) * 100) + "%");
-		}
-		if (e.getCurrentCookTime() > 0) {
-			int width = (int) (((e.getCookTime() - e.getCurrentCookTime()) * arrowWidth / (double) e.getCookTime())
-					+ 1);
-			if (e.getCurrentCookTime() == 0) {
-				width = 0;
-			}
-			ui.drawUV(ui.left + 80, ui.top + 57, 176, 37, width, arrowHeight);
-			ui.drawTooltip(ui.left + 80, ui.top + 57, arrowWidth, arrowHeight,
-					(int) ((Math.abs(e.getCurrentCookTime() - 200) / (double) e.getCookTime()) * 100) + "%");
-		} else {
-			ui.drawTooltip(ui.left + 80, ui.top + 57, arrowWidth, arrowHeight, "0%");
-		}
 	}
 
 	public static class BlockHighTemperatureAlloyFurnaceTileEntity extends FuelMachineTileEntity {
@@ -96,6 +86,52 @@ public class BlockHighTemperatureAlloyFurnace extends FuelMachine {
 			addRecipe(new DualSlotRecipe(new ItemStack(KekCraft.factory.getItem("Silicon")),
 					new ItemStack(KekCraft.factory.getItem("Silicon")),
 					new ItemStack(KekCraft.factory.getItem("RefinedSilicon"), 2), -1));
+
+			setChangeMeta(true);
+
+			onUISet = new Runnable() {
+				@Override
+				public void run() {
+					ui.addScreen(new UIScreen(ui, "MainScreen") {
+						@Override
+						public void render(MachineTileEntity m, Object... args) {
+							int flameWidth = 13;
+							int flameHeight = 13;
+							int arrowWidth = 41;
+							int arrowHeight = 16;
+
+							BlockHighTemperatureAlloyFurnaceTileEntity e = (BlockHighTemperatureAlloyFurnaceTileEntity) m;
+							if (e.getCurrentBurnTime() > 0) {
+								int height = (int) ((e.getCurrentBurnTime() / (double) e.getBurnTime()) * flameHeight);
+
+								drawUV(ui.left + 8, ui.top + 59 + (flameHeight - height), 176,
+										23 + (flameHeight - height), flameWidth, height);
+								drawTooltip(ui.left + 8, ui.top + 59, flameWidth, flameHeight,
+										(int) ((e.getCurrentBurnTime() / (double) e.getBurnTime()) * 100) + "%");
+							}
+							if (e.getCurrentCookTime() > 0) {
+								int width = (int) (((e.getCookTime() - e.getCurrentCookTime()) * arrowWidth
+										/ (double) e.getCookTime()) + 1);
+								if (e.getCurrentCookTime() == 0) {
+									width = 0;
+								}
+								drawUV(ui.left + 80, ui.top + 57, 176, 37, width, arrowHeight);
+								drawTooltip(ui.left + 80, ui.top + 57, arrowWidth, arrowHeight,
+										(int) ((Math.abs(e.getCurrentCookTime() - 200) / (double) e.getCookTime())
+												* 100) + "%");
+							} else {
+								drawTooltip(ui.left + 80, ui.top + 57, arrowWidth, arrowHeight, "0%");
+							}
+						}
+					}.addScreenSwitch(22, 0, 23, 23, "Options"));
+					ui.addScreen(new UIScreen(ui, "Options") {
+						@Override
+						public void render(MachineTileEntity e, Object... args) {
+						}
+					}.addScreenSwitch(0, 0, 23, 23, "MainScreen"));
+					ui.setCurrentUIScreen("MainScreen");
+				}
+			};
 		}
 
 		@Override

@@ -1,6 +1,7 @@
 package com.kekcraft.api.ui;
 
 import java.io.IOException;
+import java.util.Map.Entry;
 
 import com.kekcraft.ModPacket;
 
@@ -9,6 +10,7 @@ import cofh.api.energy.IEnergyConnection;
 import cofh.api.energy.IEnergyReceiver;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -68,6 +70,9 @@ public abstract class ElectricMachineTileEntity extends MachineTileEntity
 					}
 					if (currentCookTime == 0) {
 						smeltItemWhenDone();
+						if (getNextRecipe() == null) {
+							onSmeltingFinished();
+						}
 					}
 				}
 			}
@@ -108,14 +113,21 @@ public abstract class ElectricMachineTileEntity extends MachineTileEntity
 	}
 
 	@Override
-	public void read(ByteBufInputStream in) throws IOException {
+	public final void read(ByteBufInputStream in) throws IOException {
 		getEnergy().setEnergyStored(in.readInt());
 		setCurrentCookTime(in.readInt());
 		setCookTime(in.readInt());
+
+		for (int i = 0; i < faces.size(); i++) {
+			ForgeDirection dir = ForgeDirection.values()[in.readInt()];
+			FaceType face = FaceType.values()[in.readInt()];
+			faces.put(dir, face);
+		}
 	}
 
 	@Override
-	public void write(ByteBufOutputStream out) throws IOException {
+	public final void write(ByteBufOutputStream out) throws IOException {
+		out.writeInt(Minecraft.getMinecraft().theWorld.provider.dimensionId);
 		out.writeInt(xCoord);
 		out.writeInt(yCoord);
 		out.writeInt(zCoord);
@@ -123,5 +135,15 @@ public abstract class ElectricMachineTileEntity extends MachineTileEntity
 		out.writeInt(getEnergy().getEnergyStored());
 		out.writeInt(getCurrentCookTime());
 		out.writeInt(getCookTime());
+
+		for (Entry<ForgeDirection, FaceType> entry : faces.entrySet()) {
+			out.writeInt(entry.getKey().ordinal());
+			out.writeInt(entry.getValue().ordinal());
+		}
+	}
+
+	@Override
+	public final boolean canConnectEnergy(ForgeDirection from) {
+		return faces.get(from) == FaceType.ENERGY;
 	}
 }

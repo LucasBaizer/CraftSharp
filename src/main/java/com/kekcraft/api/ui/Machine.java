@@ -7,24 +7,39 @@ import java.util.Random;
 import com.kekcraft.KekCraft;
 import com.kekcraft.ModPacket;
 import com.kekcraft.api.ForgeRuntimeException;
+import com.kekcraft.api.ParticleColor;
+import com.kekcraft.api.ParticleFX;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 public abstract class Machine extends net.minecraft.block.BlockContainer {
+	private IIcon currentIcon;
+	private IIcon onIcon;
+	private IIcon offIcon;
+	private IIcon sideIcon;
+	private IIcon[] icons = new IIcon[6];
+	private boolean specialIcons;
+	private ParticleColor particleColor;
+
 	private Object modInstance;
 	private int guiID;
-	public ResourceLocation background;
+	public String background;
 	private int windowWidth = -1;
 	private int windowHeight = -1;
 
@@ -38,7 +53,7 @@ public abstract class Machine extends net.minecraft.block.BlockContainer {
 	 *            {@link UIHandler} to open the GUI on the client side. Must be
 	 *            unique.
 	 */
-	public Machine(Material material, Object modInstance, int guid, ResourceLocation background) {
+	public Machine(Material material, Object modInstance, int guid, String background) {
 		super(material);
 		setModInstance(modInstance);
 		setGuiID(guid);
@@ -49,6 +64,87 @@ public abstract class Machine extends net.minecraft.block.BlockContainer {
 		}
 
 		UIHandler.uiMap.put(guid, this);
+	}
+
+	public void setParticleColor(ParticleColor color) {
+		this.particleColor = color;
+	}
+
+	public ParticleColor getParticleColor() {
+		return this.particleColor;
+	}
+
+	public void initializeSpecialIcons() {
+		specialIcons = true;
+	}
+
+	@Override
+	public void registerBlockIcons(IIconRegister reg) {
+		if (specialIcons) {
+			onIcon = reg.registerIcon(this.textureName + "_front_on");
+			currentIcon = offIcon = reg.registerIcon(this.textureName + "_front_off");
+
+			this.sideIcon = reg.registerIcon(this.textureName + "_side");
+			for (int i = 0; i < 6; i++) {
+				this.icons[i] = this.sideIcon;
+			}
+		}
+	}
+
+	@Override
+	public IIcon getIcon(int side, int meta) {
+		if (specialIcons) {
+			if (meta == 0) {
+				if (side == 3) {
+					return offIcon;
+				}
+				return sideIcon;
+			} else {
+				if (meta > 5) {
+					this.currentIcon = onIcon;
+				}
+				IIcon old = this.icons[meta > 5 ? meta - 6 : meta];
+				this.icons[meta > 5 ? meta - 6 : meta] = currentIcon;
+				IIcon icon = this.icons[side];
+				this.icons[meta > 5 ? meta - 6 : meta] = old;
+
+				this.currentIcon = offIcon;
+
+				return icon;
+			}
+		} else {
+			return super.getIcon(side, meta);
+		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	public void randomDisplayTick(World world, int x, int y, int z, Random random) {
+		if (particleColor != null && world.getBlockMetadata(x, y, z) > 5) {
+			double d0 = 0.0625D;
+			for (int l = 0; l < 6; ++l) {
+				double d1 = (double) ((float) x + random.nextFloat());
+				double d2 = (double) ((float) y + random.nextFloat());
+				double d3 = (double) ((float) z + random.nextFloat());
+				if (l == 0 && !world.getBlock(x, y + 1, z).isOpaqueCube())
+					d2 = (double) (y + 1) + d0;
+				if (l == 1 && !world.getBlock(x, y - 1, z).isOpaqueCube())
+					d2 = (double) (y + 0) - d0;
+				if (l == 2 && !world.getBlock(x, y, z + 1).isOpaqueCube())
+					d3 = (double) (z + 1) + d0;
+				if (l == 3 && !world.getBlock(x, y, z - 1).isOpaqueCube())
+					d3 = (double) (z + 0) - d0;
+				if (l == 4 && !world.getBlock(x + 1, y, z).isOpaqueCube())
+					d1 = (double) (x + 1) + d0;
+				if (l == 5 && !world.getBlock(x - 1, y, z).isOpaqueCube())
+					d1 = (double) (x + 0) - d0;
+				if (d1 < (double) x || d1 > (double) (x + 1) || d2 < 0.0D || d2 > (double) (y + 1) || d3 < (double) z
+						|| d3 > (double) (z + 1)) {
+					ParticleFX var20 = new ParticleFX(world, d1, d2, d3, particleColor.getRed(),
+							particleColor.getGreen(), particleColor.getBlue());
+					FMLClientHandler.instance().getClient().effectRenderer.addEffect(var20);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -130,6 +226,8 @@ public abstract class Machine extends net.minecraft.block.BlockContainer {
 
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
+		currentIcon = offIcon;
+
 		MachineTileEntity tile = (MachineTileEntity) world.getTileEntity(x, y, z);
 		if (tile != null) {
 			for (int i = 0; i < tile.getSizeInventory(); ++i) {
@@ -181,7 +279,10 @@ public abstract class Machine extends net.minecraft.block.BlockContainer {
 
 	public abstract void drawTiles(MachineContainer container);
 
-	public abstract void drawToUI(MachineUI ui, MachineTileEntity entity);
+	public void drawToUI(MachineUI ui, MachineTileEntity entity) {
+		if (ui.getCurrentUIScreen() != null)
+			ui.getCurrentUIScreen().render(entity);
+	}
 
 	public void setWindowDimensions(Dimension dim) {
 		this.windowWidth = dim.width;
@@ -194,5 +295,13 @@ public abstract class Machine extends net.minecraft.block.BlockContainer {
 
 	public boolean hasAnySpecificDimensions() {
 		return windowWidth != -1 || windowHeight != -1;
+	}
+
+	private ResourceLocation defaultBackground;
+
+	public ResourceLocation getDefaultBackground() {
+		return defaultBackground == null
+				? (defaultBackground = new ResourceLocation(KekCraft.MODID, "textures/ui/" + background + ".png"))
+				: defaultBackground;
 	}
 }

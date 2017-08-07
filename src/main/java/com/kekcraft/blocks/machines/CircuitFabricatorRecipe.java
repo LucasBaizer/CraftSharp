@@ -26,7 +26,7 @@ public class CircuitFabricatorRecipe implements IMachineRecipe {
 	@Override
 	public boolean satifies(ItemStack[] slots) {
 		return has(slots[0], KekCraft.factory.getItem("RefinedSilicon")) && slots[1] != null
-				&& slots[1].getItem() == inputA.getItem() && slots[2].getItem() == inputB.getItem();
+				&& slots[1].getItem() == inputA.getItem() && slots[2] != null && slots[2].getItem() == inputB.getItem();
 	}
 
 	private boolean has(ItemStack itemStack, Item item) {

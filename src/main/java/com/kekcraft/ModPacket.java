@@ -13,11 +13,20 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 
 public class ModPacket {
 	public static void sendTileEntityUpdate(MachineTileEntity machine) {
 		try {
 			KekCraft.channel.sendToAll(createMachinePacket(machine));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void sendTileEntityUpdateToServer(MachineTileEntity machine) {
+		try {
+			KekCraft.channel.sendToServer(createMachinePacket(machine));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -35,19 +44,23 @@ public class ModPacket {
 	public static void processPacketOnClientSide(ByteBuf parBB, Side parSide) throws IOException {
 		try {
 			if (parSide == Side.CLIENT) {
-				World world = Minecraft.getMinecraft().theWorld;
 				ByteBufInputStream in = new ByteBufInputStream(parBB);
 
-				int x = in.readInt();
-				int y = in.readInt();
-				int z = in.readInt();
+				int dim = in.readInt();
+				if (Minecraft.getMinecraft().theWorld.provider.dimensionId == dim) {
+					int x = in.readInt();
+					int y = in.readInt();
+					int z = in.readInt();
 
-				MachineTileEntity entity = (MachineTileEntity) getTileEntityByID(x, y, z, world);
+					MachineTileEntity entity = (MachineTileEntity) getTileEntityByID(x, y, z,
+							Minecraft.getMinecraft().theWorld);
 
-				// checks to make sure entity was not destroyed between packet
-				// send and packet receive
-				if (entity != null) {
-					entity.read(in);
+					// checks to make sure entity was not destroyed between
+					// packet
+					// send and packet receive
+					if (entity != null) {
+						entity.read(in);
+					}
 				}
 				in.close();
 			}
@@ -56,9 +69,27 @@ public class ModPacket {
 		}
 	}
 
-	public static void processPacketOnServerSide(ByteBuf payload, Side parSide) {
+	public static void processPacketOnServerSide(ByteBuf payload, Side parSide) throws IOException {
 		if (parSide == Side.SERVER) {
-			// nothing sent to server by client
+			ByteBufInputStream in = new ByteBufInputStream(payload.copy());
+
+			int dim = in.readInt();
+			int x = in.readInt();
+			int y = in.readInt();
+			int z = in.readInt();
+
+			MachineTileEntity entity = (MachineTileEntity) getTileEntityByID(x, y, z, DimensionManager.getWorld(dim));
+
+			// checks to make sure entity was not destroyed between
+			// packet
+			// send and packet receive
+			if (entity != null) {
+				entity.read(in);
+			}
+
+			in.close();
+
+			KekCraft.channel.sendToAll(new FMLProxyPacket(payload, KekCraft.networkChannelName));
 		}
 	}
 

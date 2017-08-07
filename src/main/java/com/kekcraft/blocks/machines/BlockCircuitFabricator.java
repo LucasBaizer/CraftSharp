@@ -6,29 +6,38 @@ import com.kekcraft.KekCraft;
 import com.kekcraft.RecipeHandler;
 import com.kekcraft.Tabs;
 import com.kekcraft.api.GameFactory;
+import com.kekcraft.api.ParticleColor;
 import com.kekcraft.api.ui.ElectricMachine;
 import com.kekcraft.api.ui.ElectricMachineTileEntity;
 import com.kekcraft.api.ui.MachineContainer;
 import com.kekcraft.api.ui.MachineTileEntity;
-import com.kekcraft.api.ui.MachineUI;
+import com.kekcraft.api.ui.UIScreen;
 
+import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class BlockCircuitFabricator extends ElectricMachine {
 	public BlockCircuitFabricator(GameFactory factory) {
-		super(Material.glass, KekCraft.modInstance, 5,
-				new ResourceLocation(KekCraft.MODID, "textures/ui/CircuitFabricator.png"));
+		super(Material.glass, KekCraft.modInstance, 5, "CircuitFabricator");
 
 		factory.initializeBlock(this, "Circuit Fabricator", "CircuitFabricator", Tabs.DEFAULT, "CircuitFabricator");
-		RecipeHandler.RECIPES.add(new ShapedOreRecipe(new ItemStack(this), "ABA", "CDC", "AEA", 'A', "ingotAluminum",
-				'B', "blockSilicon", 'C', "gearIron", 'D', KekCraft.factory.getItem("MachineCore"), 'E', "ingotGold"));
+
+		RecipeHandler.FUTURES.add(new Runnable() {
+			@Override
+			public void run() {
+				GameRegistry
+						.addRecipe(new ShapedOreRecipe(new ItemStack(KekCraft.factory.getBlock("CircuitFabricator")),
+								"ABA", "CDC", "AEA", 'A', "ingotAluminum", 'B', "blockSilicon", 'C', "gearIron", 'D',
+								KekCraft.factory.getItem("MachineCore"), 'E', "ingotGold"));
+			}
+		});
 		setWindowDimensions(new Dimension(-1, 189));
+		initializeSpecialIcons();
+		setParticleColor(ParticleColor.GREEN);
 	}
 
 	@Override
@@ -45,34 +54,6 @@ public class BlockCircuitFabricator extends ElectricMachine {
 		container.addSlotToContainer(container.createSlot(1, 56, 57));
 		container.addSlotToContainer(container.createSlot(2, 56, 80));
 		container.addSlotToContainer(container.createOutputSlot(3, 135, 58));
-	}
-
-	@Override
-	public void drawToUI(MachineUI ui, MachineTileEntity entity) {
-		BlockCircuitFabricatorTileEntity e = (BlockCircuitFabricatorTileEntity) entity;
-
-		int barWidth = 7;
-		int barHeight = 74;
-		int targetHeight = (barHeight - (e.getEnergy().getMaxEnergyStored() - e.getEnergy().getEnergyStored())
-				* barHeight / e.getEnergy().getMaxEnergyStored());
-		ui.drawUV(ui.left + 26, ui.top + 29 + (barHeight - targetHeight), 176, 23 + barHeight - targetHeight, barWidth,
-				targetHeight);
-		ui.drawTooltip(ui.left + 26, ui.top + 29, barWidth, barHeight, (int) e.getEnergy().getEnergyStored() + " RF");
-
-		int arrowWidth = 43;
-		int arrowHeight = 16;
-		if (e.getCurrentCookTime() > 0) {
-			int width = (int) (((e.getCookTime() - e.getCurrentCookTime()) * arrowWidth / (double) e.getCookTime())
-					+ 1);
-			if (e.getCurrentCookTime() == 0) {
-				width = 0;
-			}
-			ui.drawUV(ui.left + 79, ui.top + 57, 176, 97, width, arrowHeight);
-			ui.drawTooltip(ui.left + 79, ui.top + 57, arrowWidth, arrowHeight,
-					100 - (int) ((e.getCurrentCookTime() / (double) e.getCookTime()) * 100) + "%");
-		} else {
-			ui.drawTooltip(ui.left + 79, ui.top + 57, arrowWidth, arrowHeight, "0%");
-		}
 	}
 
 	public static class BlockCircuitFabricatorTileEntity extends ElectricMachineTileEntity {
@@ -104,11 +85,53 @@ public class BlockCircuitFabricator extends ElectricMachine {
 			addRecipe(new CircuitFabricatorRecipe(new ItemStack(Items.emerald),
 					new ItemStack(KekCraft.factory.getItem("CircuitDiamond")),
 					KekCraft.factory.getItem("CircuitEmerald")));
-		}
 
-		@Override
-		public boolean canConnectEnergy(ForgeDirection from) {
-			return true;
+			setChangeMeta(true);
+
+			onUISet = new Runnable() {
+				@Override
+				public void run() {
+					ui.addScreen(new UIScreen(ui, "MainScreen") {
+						@Override
+						public void render(MachineTileEntity m, Object... args) {
+							BlockCircuitFabricatorTileEntity e = (BlockCircuitFabricatorTileEntity) m;
+
+							int barWidth = 7;
+							int barHeight = 74;
+							int targetHeight = (barHeight
+									- (e.getEnergy().getMaxEnergyStored() - e.getEnergy().getEnergyStored()) * barHeight
+											/ e.getEnergy().getMaxEnergyStored());
+							drawUV(ui.left + 26, ui.top + 29 + (barHeight - targetHeight), 176,
+									23 + barHeight - targetHeight, barWidth, targetHeight);
+							drawTooltip(ui.left + 26, ui.top + 29, barWidth, barHeight,
+									(int) e.getEnergy().getEnergyStored() + " RF");
+
+							int arrowWidth = 43;
+							int arrowHeight = 16;
+							if (e.getCurrentCookTime() > 0) {
+								int width = (int) (((e.getCookTime() - e.getCurrentCookTime()) * arrowWidth
+										/ (double) e.getCookTime()) + 1);
+								if (e.getCurrentCookTime() == 0) {
+									width = 0;
+								}
+								drawUV(ui.left + 79, ui.top + 57, 176, 97, width, arrowHeight);
+								drawTooltip(ui.left + 79, ui.top + 57, arrowWidth, arrowHeight,
+										100 - (int) ((e.getCurrentCookTime() / (double) e.getCookTime()) * 100) + "%");
+							} else {
+								drawTooltip(ui.left + 79, ui.top + 57, arrowWidth, arrowHeight, "0%");
+							}
+						}
+					}.addScreenSwitch(22, 0, 23, 23, "Options"));
+
+					ui.addScreen(new UIScreen(ui, "Options") {
+						@Override
+						public void render(MachineTileEntity e, Object... args) {
+						}
+					}.addScreenSwitch(0, 0, 23, 23, "MainScreen"));
+
+					ui.setCurrentUIScreen("MainScreen");
+				}
+			};
 		}
 	}
 }

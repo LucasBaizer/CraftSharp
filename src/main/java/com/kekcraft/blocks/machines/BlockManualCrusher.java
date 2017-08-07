@@ -1,32 +1,57 @@
 package com.kekcraft.blocks.machines;
 
+import static net.minecraft.init.Items.*;
+
 import java.awt.Dimension;
 
 import com.kekcraft.KekCraft;
+import com.kekcraft.RecipeHandler;
 import com.kekcraft.Tabs;
 import com.kekcraft.api.GameFactory;
-import com.kekcraft.api.ui.ElectricMachine;
 import com.kekcraft.api.ui.DefaultMachineRecipe;
+import com.kekcraft.api.ui.ElectricMachine;
 import com.kekcraft.api.ui.ElectricMachineTileEntity;
 import com.kekcraft.api.ui.MachineContainer;
-import com.kekcraft.api.ui.MachineTileEntity;
-import com.kekcraft.api.ui.MachineUI;
 
+import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class BlockManualCrusher extends ElectricMachine {
+	private IIcon topIcon;
+
 	public BlockManualCrusher(GameFactory factory) {
-		super(Material.glass, KekCraft.modInstance, 3,
-				new ResourceLocation(KekCraft.MODID, "textures/ui/ManualCrusher.png"));
+		super(Material.glass, KekCraft.modInstance, 3, "ManualCrusher");
 		factory.initializeBlock(this, "Manual Crusher", "ManualCrusher", Tabs.DEFAULT, "ManualCrusher");
 		setWindowDimensions(new Dimension(-1, 189));
+
+		RecipeHandler.FUTURES.add(new Runnable() {
+			@Override
+			public void run() {
+				GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(KekCraft.factory.getBlock("ManualCrusher")),
+						" A ", "B B", "CCC", 'A', stick, 'B', "gearIron", 'C', iron_ingot));
+			}
+		});
+		initializeSpecialIcons();
+	}
+
+	@Override
+	public void registerBlockIcons(IIconRegister reg) {
+		super.registerBlockIcons(reg);
+
+		this.topIcon = reg.registerIcon(this.textureName + "_top");
+	}
+
+	@Override
+	public IIcon getIcon(int side, int meta) {
+		return side == 1 ? topIcon : super.getIcon(side, meta);
 	}
 
 	@Override
@@ -57,10 +82,6 @@ public class BlockManualCrusher extends ElectricMachine {
 		container.addSlotToContainer(container.createOutputSlot(1, 110, 58));
 	}
 
-	@Override
-	public void drawToUI(MachineUI ui, MachineTileEntity entity) {
-	}
-
 	public static class BlockManualCrusherTileEntity extends ElectricMachineTileEntity {
 		public BlockManualCrusherTileEntity() {
 			super(2, 100 / 10);
@@ -83,11 +104,6 @@ public class BlockManualCrusher extends ElectricMachine {
 		@Override
 		public void onInputSlotExhausted(int slot) {
 			getEnergy().setEnergyStored(0);
-		}
-
-		@Override
-		public boolean canConnectEnergy(ForgeDirection from) {
-			return false;
 		}
 	}
 }

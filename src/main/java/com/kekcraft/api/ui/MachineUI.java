@@ -1,6 +1,9 @@
 package com.kekcraft.api.ui;
 
+import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import org.lwjgl.opengl.GL11;
 
@@ -15,15 +18,34 @@ public class MachineUI extends GuiContainer {
 	public int mouseX;
 	public int mouseY;
 	private Machine block;
+	private UIScreen currentScreen;
+	private HashMap<String, UIScreen> screens = new HashMap<String, UIScreen>();
+	private ArrayList<ClickListener> clickListeners = new ArrayList<ClickListener>();
 
 	public MachineUI(InventoryPlayer inventory, Machine block, MachineTileEntity tileEntity) {
 		super(new MachineContainer(inventory, block, tileEntity));
+
+		tileEntity.ui = this;
+		if (tileEntity.onUISet != null)
+			tileEntity.onUISet.run();
 
 		this.tileEntity = tileEntity;
 		this.block = block;
 	}
 
-	public void drawTooltip(int x, int y, int width, int height, String text) {
+	public void addScreen(UIScreen screen) {
+		screens.put(screen.getName(), screen);
+	}
+
+	public void setCurrentUIScreen(String name) {
+		currentScreen = screens.get(name);
+	}
+
+	public UIScreen getCurrentUIScreen() {
+		return currentScreen;
+	}
+
+	void drawTooltip(int x, int y, int width, int height, String text) {
 		if (mouseX > x && mouseX < x + width) {
 			if (mouseY > y && mouseY < y + height) {
 				this.func_146283_a(Arrays.asList(new String[] { text }), mouseX, mouseY);
@@ -31,15 +53,12 @@ public class MachineUI extends GuiContainer {
 		}
 	}
 
-	public void drawUV(int destX, int destY, int srcX, int srcY, int width, int height) {
-		this.drawTexturedModalRect(destX, destY, srcX, srcY, width, height);
-	}
-
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3) {
 		GL11.glColor4f(1f, 1f, 1f, 1f);
 
-		this.mc.getTextureManager().bindTexture(block.background);
+		this.mc.getTextureManager().bindTexture(
+				currentScreen == null ? block.getDefaultBackground() : currentScreen.getBackgroundTexture(block));
 		if (block.hasAnySpecificDimensions()) {
 			this.xSize = block.getWindowDimensions().width != -1 ? block.getWindowDimensions().width : this.xSize;
 			this.ySize = block.getWindowDimensions().height != -1 ? block.getWindowDimensions().height : this.ySize;
@@ -57,5 +76,30 @@ public class MachineUI extends GuiContainer {
 		this.mouseY = par2;
 
 		super.drawScreen(par1, par2, par3);
+	}
+
+	@Override
+	protected void mouseClicked(int x, int y, int par3) {
+		super.mouseClicked(x, y, par3);
+
+		for (ClickListener listener : clickListeners) {
+			if (listener.rect.contains(x - left, y - top)) {
+				listener.callback.run();
+			}
+		}
+	}
+
+	public void addClickListener(UIScreen uiScreen, Rectangle rectangle, Runnable r) {
+		clickListeners.add(new ClickListener(rectangle, r));
+	}
+
+	private static class ClickListener {
+		public Rectangle rect;
+		public Runnable callback;
+
+		public ClickListener(Rectangle rect, Runnable callback) {
+			this.rect = rect;
+			this.callback = callback;
+		}
 	}
 }
