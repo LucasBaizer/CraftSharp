@@ -95,31 +95,28 @@ public abstract class Machine extends net.minecraft.block.BlockContainer {
 	public IIcon getIcon(int side, int meta) {
 		if (specialIcons) {
 			if (meta == 0) {
-				if (side == 3) {
-					return offIcon;
-				}
-				return sideIcon;
+				return side == 3 ? offIcon : sideIcon;
 			} else {
-				if (meta > 5) {
-					this.currentIcon = onIcon;
+				try {
+					if ((meta & 8) == 8) {
+						this.currentIcon = onIcon;
+						meta &= 7;
+					} else {
+						this.currentIcon = offIcon;
+					}
+					return side == meta ? this.currentIcon : sideIcon;
+				} catch (ArrayIndexOutOfBoundsException e) {
+					System.err.println("Meta is out of range! Meta value: " + meta);
+					return super.getIcon(side, meta);
 				}
-				IIcon old = this.icons[meta > 5 ? meta - 6 : meta];
-				this.icons[meta > 5 ? meta - 6 : meta] = currentIcon;
-				IIcon icon = this.icons[side];
-				this.icons[meta > 5 ? meta - 6 : meta] = old;
-
-				this.currentIcon = offIcon;
-
-				return icon;
 			}
-		} else {
-			return super.getIcon(side, meta);
 		}
+		return super.getIcon(side, meta);
 	}
 
 	@SideOnly(Side.CLIENT)
 	public void randomDisplayTick(World world, int x, int y, int z, Random random) {
-		if (particleColor != null && world.getBlockMetadata(x, y, z) > 5) {
+		if (particleColor != null && (world.getBlockMetadata(x, y, z) & 8) == 8) {
 			double d0 = 0.0625D;
 			for (int l = 0; l < 6; ++l) {
 				double d1 = (double) ((float) x + random.nextFloat());
@@ -150,20 +147,20 @@ public abstract class Machine extends net.minecraft.block.BlockContainer {
 	@Override
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack item) {
 		switch (MathHelper.floor_double((double) (entity.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3) {
-		case 0:
-			world.setBlockMetadataWithNotify(x, y, z, 2, 2);
-			break;
-		case 1:
-			world.setBlockMetadataWithNotify(x, y, z, 5, 2);
-			break;
-		case 2:
-			world.setBlockMetadataWithNotify(x, y, z, 3, 2);
-			break;
-		case 3:
-			world.setBlockMetadataWithNotify(x, y, z, 4, 2);
-			break;
-		default:
-			break;
+			case 0:
+				world.setBlockMetadataWithNotify(x, y, z, 2, 2); // north facing
+				break;
+			case 1:
+				world.setBlockMetadataWithNotify(x, y, z, 5, 2); // east facing
+				break;
+			case 2:
+				world.setBlockMetadataWithNotify(x, y, z, 3, 2); // south facing
+				break;
+			case 3:
+				world.setBlockMetadataWithNotify(x, y, z, 4, 2); // west facing
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -178,16 +175,16 @@ public abstract class Machine extends net.minecraft.block.BlockContainer {
 			byte b0 = 3;
 
 			if (block.func_149730_j() && !block1.func_149730_j()) {
-				b0 = 3;
+				b0 = 3; // south facing
 			}
 			if (block1.func_149730_j() && !block.func_149730_j()) {
-				b0 = 2;
+				b0 = 2; // north facing
 			}
 			if (block2.func_149730_j() && !block3.func_149730_j()) {
-				b0 = 5;
+				b0 = 5; // east facing
 			}
 			if (block3.func_149730_j() && !block2.func_149730_j()) {
-				b0 = 4;
+				b0 = 4; // west facing
 			}
 
 			world.setBlockMetadataWithNotify(x, y, z, b0, 2);

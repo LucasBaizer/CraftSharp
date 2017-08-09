@@ -2,15 +2,12 @@ package com.kekcraft.api.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map.Entry;
 
 import com.kekcraft.ModPacket;
 
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.ForgeDirection;
 
 public abstract class FuelMachineTileEntity extends MachineTileEntity {
 	public FuelMachineTileEntity(int slots, int tickUpdateRate) {
@@ -146,33 +143,17 @@ public abstract class FuelMachineTileEntity extends MachineTileEntity {
 
 	@Override
 	public void read(ByteBufInputStream in) throws IOException {
+		super.read(in);
+		
 		currentBurnTime = in.readInt();
 		burnTime = in.readInt();
-		currentCookTime = in.readInt();
-		cookTime = in.readInt();
-
-		for (int i = 0; i < faces.size(); i++) {
-			ForgeDirection dir = ForgeDirection.values()[in.readInt()];
-			FaceType face = FaceType.values()[in.readInt()];
-			faces.put(dir, face);
-		}
 	}
 
 	@Override
 	public void write(ByteBufOutputStream out) throws IOException {
-		out.writeInt(Minecraft.getMinecraft().theWorld.provider.dimensionId);
-		out.writeInt(xCoord);
-		out.writeInt(yCoord);
-		out.writeInt(zCoord);
-
+		super.write(out);
+		
 		out.writeInt(getCurrentBurnTime());
 		out.writeInt(getBurnTime());
-		out.writeInt(getCurrentCookTime());
-		out.writeInt(getCookTime());
-
-		for (Entry<ForgeDirection, FaceType> entry : faces.entrySet()) {
-			out.writeInt(entry.getKey().ordinal());
-			out.writeInt(entry.getValue().ordinal());
-		}
 	}
 }

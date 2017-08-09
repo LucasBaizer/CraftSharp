@@ -62,7 +62,7 @@ public class BlockManualCrusher extends ElectricMachine {
 		if (player.isSneaking()) {
 			BlockManualCrusherTileEntity tile = (BlockManualCrusherTileEntity) world.getTileEntity(x, y, z);
 			if (tile.getStackInSlot(0) != null) {
-				tile.getEnergy().modifyEnergyStored(5);
+				tile.energy.modifyEnergyStored(5);
 			}
 		}
 		return true;
@@ -86,9 +86,9 @@ public class BlockManualCrusher extends ElectricMachine {
 		public BlockManualCrusherTileEntity() {
 			super(2, 100 / 10);
 
-			getEnergy().setCapacity(100);
-			getEnergy().setMaxTransfer(0);
-			getEnergy().setEnergyStored(0);
+			energy.setCapacity(100);
+			energy.setMaxTransfer(0);
+			energy.setEnergyStored(0);
 
 			setItemSlots(new int[] { 0 });
 			setOutputSlots(new int[] { 1 });
@@ -103,7 +103,7 @@ public class BlockManualCrusher extends ElectricMachine {
 
 		@Override
 		public void onInputSlotExhausted(int slot) {
-			getEnergy().setEnergyStored(0);
+			energy.setEnergyStored(0);
 		}
 	}
 }

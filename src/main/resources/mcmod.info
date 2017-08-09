@@ -1,14 +1,14 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
+  "modid": "kekcraft",
+  "name": "KekCraft",
+  "description": "KekCraft, general purpose tech mod!.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
+  "authorList": ["GoodZucc"],
+  "credits": "Lucas Baizer (GoodZucc), creator of this mod!",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []

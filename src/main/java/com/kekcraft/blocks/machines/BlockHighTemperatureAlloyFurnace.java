@@ -9,11 +9,13 @@ import com.kekcraft.RecipeHandler;
 import com.kekcraft.Tabs;
 import com.kekcraft.api.GameFactory;
 import com.kekcraft.api.ParticleColor;
+import com.kekcraft.api.ui.FaceType;
 import com.kekcraft.api.ui.FuelMachine;
 import com.kekcraft.api.ui.FuelMachineFuel;
 import com.kekcraft.api.ui.FuelMachineTileEntity;
 import com.kekcraft.api.ui.MachineContainer;
 import com.kekcraft.api.ui.MachineTileEntity;
+import com.kekcraft.api.ui.UIOptionsScreen;
 import com.kekcraft.api.ui.UIScreen;
 
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -124,11 +126,7 @@ public class BlockHighTemperatureAlloyFurnace extends FuelMachine {
 							}
 						}
 					}.addScreenSwitch(22, 0, 23, 23, "Options"));
-					ui.addScreen(new UIScreen(ui, "Options") {
-						@Override
-						public void render(MachineTileEntity e, Object... args) {
-						}
-					}.addScreenSwitch(0, 0, 23, 23, "MainScreen"));
+					ui.addScreen(new UIOptionsScreen(ui, FaceType.NONE, FaceType.ENERGY, FaceType.ITEM));
 					ui.setCurrentUIScreen("MainScreen");
 				}
 			};

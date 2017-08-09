@@ -18,7 +18,7 @@ public abstract class GeneratorTileEntity extends ElectricMachineTileEntity impl
 
 	@Override
 	public int extractEnergy(ForgeDirection from, int maxExtract, boolean simulate) {
-		int extracted = getEnergy().extractEnergy(maxExtract, simulate);
+		int extracted = energy.extractEnergy(maxExtract, simulate);
 		if (extracted > 0) {
 			ModPacket.sendTileEntityUpdate(this);
 		}

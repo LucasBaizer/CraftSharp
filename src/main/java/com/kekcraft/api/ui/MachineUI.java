@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Slot;
 
 public class MachineUI extends GuiContainer {
 	public MachineTileEntity tileEntity;
@@ -75,29 +76,53 @@ public class MachineUI extends GuiContainer {
 		this.mouseX = par1;
 		this.mouseY = par2;
 
-		super.drawScreen(par1, par2, par3);
+		if (!currentScreen.getName().equals("MainScreen")) {
+			@SuppressWarnings("unchecked")
+			ArrayList<Slot> copy = new ArrayList<Slot>(this.inventorySlots.inventorySlots);
+			for (int i = tileEntity.getSizeInventory(); i > 0; i--) {
+				this.inventorySlots.inventorySlots.remove(this.inventorySlots.inventorySlots.size() - 1);
+			}
+			super.drawScreen(par1, par2, par3);
+			this.inventorySlots.inventorySlots = copy;
+		} else {
+			super.drawScreen(par1, par2, par3);
+		}
 	}
 
 	@Override
 	protected void mouseClicked(int x, int y, int par3) {
-		super.mouseClicked(x, y, par3);
+		if (!currentScreen.getName().equals("MainScreen")) {
+			@SuppressWarnings("unchecked")
+			ArrayList<Slot> copy = new ArrayList<Slot>(this.inventorySlots.inventorySlots);
+			for (int i = tileEntity.getSizeInventory(); i > 0; i--) {
+				this.inventorySlots.inventorySlots.remove(this.inventorySlots.inventorySlots.size() - 1);
+			}
+			super.mouseClicked(x, y, par3);
+			this.inventorySlots.inventorySlots = copy;
+		} else {
+			super.mouseClicked(x, y, par3);
+		}
 
 		for (ClickListener listener : clickListeners) {
-			if (listener.rect.contains(x - left, y - top)) {
-				listener.callback.run();
+			if (listener.screen == currentScreen) {
+				if (listener.rect.contains(x - left, y - top)) {
+					listener.callback.run();
+				}
 			}
 		}
 	}
 
 	public void addClickListener(UIScreen uiScreen, Rectangle rectangle, Runnable r) {
-		clickListeners.add(new ClickListener(rectangle, r));
+		clickListeners.add(new ClickListener(uiScreen, rectangle, r));
 	}
 
 	private static class ClickListener {
+		public UIScreen screen;
 		public Rectangle rect;
 		public Runnable callback;
 
-		public ClickListener(Rectangle rect, Runnable callback) {
+		public ClickListener(UIScreen screen, Rectangle rect, Runnable callback) {
+			this.screen = screen;
 			this.rect = rect;
 			this.callback = callback;
 		}

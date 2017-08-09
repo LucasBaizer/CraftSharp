@@ -23,7 +23,7 @@ public class DoxCommand implements ICommand {
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender var1) {
+	public String getCommandUsage(ICommandSender sender) {
 		return "/dox <username>";
 	}
 

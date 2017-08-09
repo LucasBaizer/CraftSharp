@@ -63,9 +63,9 @@ public class BlockElectricFurnace extends ElectricMachine {
 		public BlockElectricFurnaceTileEntity() {
 			super(2, 5);
 
-			getEnergy().setCapacity(100000);
-			getEnergy().setMaxTransfer(128);
-			getEnergy().setEnergyStored(KekCraft.ENERGY_MODE_DEV ? 100000 : 0);
+			energy.setCapacity(100000);
+			energy.setMaxTransfer(128);
+			energy.setEnergyStored(KekCraft.ENERGY_MODE_DEV ? 100000 : 0);
 
 			setItemSlots(new int[] { 0 });
 			setOutputSlots(new int[] { 1 });
@@ -89,12 +89,12 @@ public class BlockElectricFurnace extends ElectricMachine {
 							int barWidth = 7;
 							int barHeight = 74;
 							int targetHeight = (barHeight
-									- (e.getEnergy().getMaxEnergyStored() - e.getEnergy().getEnergyStored()) * barHeight
-											/ e.getEnergy().getMaxEnergyStored());
+									- (e.energy.getMaxEnergyStored() - e.energy.getEnergyStored()) * barHeight
+											/ e.energy.getMaxEnergyStored());
 							drawUV(ui.left + 8, ui.top + 28 + (barHeight - targetHeight), 176,
 									23 + barHeight - targetHeight, barWidth, targetHeight);
 							drawTooltip(ui.left + 8, ui.top + 27, barWidth, barHeight,
-									(int) e.getEnergy().getEnergyStored() + " RF");
+									(int) e.energy.getEnergyStored() + " RF");
 
 							int arrowWidth = 24;
 							int arrowHeight = 16;

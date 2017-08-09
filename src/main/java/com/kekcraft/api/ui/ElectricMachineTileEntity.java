@@ -1,29 +1,24 @@
 package com.kekcraft.api.ui;
 
 import java.io.IOException;
-import java.util.Map.Entry;
 
 import com.kekcraft.ModPacket;
 
 import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyConnection;
 import cofh.api.energy.IEnergyReceiver;
+import cofh.api.tileentity.IEnergyInfo;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public abstract class ElectricMachineTileEntity extends MachineTileEntity
-		implements IEnergyReceiver, IEnergyConnection {
+		implements IEnergyReceiver, IEnergyConnection, IEnergyInfo {
+	public EnergyStorage energy = new EnergyStorage(0);
+
 	public ElectricMachineTileEntity(int slots, int update) {
 		super(slots, update);
-	}
-
-	protected EnergyStorage energy = new EnergyStorage(0);
-
-	public EnergyStorage getEnergy() {
-		return energy;
 	}
 
 	private int getEnergyCostPerCook(IMachineRecipe recipe) {
@@ -108,38 +103,42 @@ public abstract class ElectricMachineTileEntity extends MachineTileEntity
 	}
 
 	@Override
+	public int getInfoEnergyPerTick() {
+		return isBurningRecipe() ? getEnergyCostPerCook(currentRecipe) : 0;
+	}
+
+	@Override
+	public int getInfoMaxEnergyPerTick() {
+		return getEnergyCostPerCook(validRecipes.get(0));
+	}
+
+	@Override
+	public int getInfoEnergyStored() {
+		return energy.getEnergyStored();
+	}
+
+	@Override
+	public int getInfoMaxEnergyStored() {
+		return energy.getMaxEnergyStored();
+	}
+
+	@Override
 	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
-		return getEnergy().receiveEnergy(maxReceive, simulate);
+		return faces.get(from) == FaceType.ENERGY ? energy.receiveEnergy(maxReceive, simulate) : 0;
 	}
 
 	@Override
 	public final void read(ByteBufInputStream in) throws IOException {
-		getEnergy().setEnergyStored(in.readInt());
-		setCurrentCookTime(in.readInt());
-		setCookTime(in.readInt());
+		super.read(in);
 
-		for (int i = 0; i < faces.size(); i++) {
-			ForgeDirection dir = ForgeDirection.values()[in.readInt()];
-			FaceType face = FaceType.values()[in.readInt()];
-			faces.put(dir, face);
-		}
+		energy.setEnergyStored(in.readInt());
 	}
 
 	@Override
 	public final void write(ByteBufOutputStream out) throws IOException {
-		out.writeInt(Minecraft.getMinecraft().theWorld.provider.dimensionId);
-		out.writeInt(xCoord);
-		out.writeInt(yCoord);
-		out.writeInt(zCoord);
+		super.write(out);
 
-		out.writeInt(getEnergy().getEnergyStored());
-		out.writeInt(getCurrentCookTime());
-		out.writeInt(getCookTime());
-
-		for (Entry<ForgeDirection, FaceType> entry : faces.entrySet()) {
-			out.writeInt(entry.getKey().ordinal());
-			out.writeInt(entry.getValue().ordinal());
-		}
+		out.writeInt(energy.getEnergyStored());
 	}
 
 	@Override

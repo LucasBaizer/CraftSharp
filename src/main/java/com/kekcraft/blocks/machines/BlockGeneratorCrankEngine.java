@@ -65,7 +65,7 @@ public class BlockGeneratorCrankEngine extends Generator {
 		if (player.isSneaking()) {
 			BlockGeneratorCrankEngineTileEntity tile = (BlockGeneratorCrankEngineTileEntity) world.getTileEntity(x, y,
 					z);
-			tile.getEnergy().modifyEnergyStored(25);
+			tile.energy.modifyEnergyStored(25);
 			ModPacket.sendTileEntityUpdate(tile);
 		}
 		return true;
@@ -87,9 +87,9 @@ public class BlockGeneratorCrankEngine extends Generator {
 			setItemSlots(new int[0]);
 			setOutputSlots(new int[0]);
 
-			getEnergy().setCapacity(10000);
-			getEnergy().setMaxTransfer(128);
-			getEnergy().setEnergyStored(0);
+			energy.setCapacity(10000);
+			energy.setMaxTransfer(128);
+			energy.setEnergyStored(0);
 
 			onUISet = new Runnable() {
 				@Override
@@ -102,12 +102,12 @@ public class BlockGeneratorCrankEngine extends Generator {
 							int barWidth = 7;
 							int barHeight = 74;
 							int targetHeight = (barHeight
-									- ((int) e.getEnergy().getMaxEnergyStored() - (int) e.getEnergy().getEnergyStored())
-											* barHeight / (int) e.getEnergy().getMaxEnergyStored());
+									- ((int) e.energy.getMaxEnergyStored() - (int) e.energy.getEnergyStored())
+											* barHeight / (int) e.energy.getMaxEnergyStored());
 							drawUV(ui.left + 85, ui.top + 6 + (barHeight - targetHeight), 176, barHeight - targetHeight,
 									barWidth, targetHeight);
 							drawTooltip(ui.left + 85, ui.top + 6, barWidth, barHeight,
-									e.getEnergy().getEnergyStored() + " RF");
+									e.energy.getEnergyStored() + " RF");
 						}
 					}.addScreenSwitch(22, 0, 23, 23, "Options"));
 					ui.addScreen(new UIScreen(ui, "Options") {

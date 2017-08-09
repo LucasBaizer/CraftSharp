@@ -8,9 +8,11 @@ import com.kekcraft.Tabs;
 import com.kekcraft.api.GameFactory;
 import com.kekcraft.api.ui.ElectricMachine;
 import com.kekcraft.api.ui.ElectricMachineTileEntity;
+import com.kekcraft.api.ui.FaceType;
 import com.kekcraft.api.ui.IMachineRecipe;
 import com.kekcraft.api.ui.MachineContainer;
 import com.kekcraft.api.ui.MachineTileEntity;
+import com.kekcraft.api.ui.UIOptionsScreen;
 import com.kekcraft.api.ui.UIScreen;
 
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -61,9 +63,9 @@ public class BlockOxidizer extends ElectricMachine {
 		public BlockOxidizerTileEntity() {
 			super(3, 100 / 24);
 
-			getEnergy().setCapacity(100000);
-			getEnergy().setMaxTransfer(128);
-			getEnergy().setEnergyStored(KekCraft.ENERGY_MODE_DEV ? 100000 : 0);
+			energy.setCapacity(100000);
+			energy.setMaxTransfer(128);
+			energy.setEnergyStored(KekCraft.ENERGY_MODE_DEV ? 100000 : 0);
 
 			setItemSlots(new int[] { 0, 1 });
 			setOutputSlots(new int[] { 2 });
@@ -82,12 +84,12 @@ public class BlockOxidizer extends ElectricMachine {
 							int barWidth = 7;
 							int barHeight = 74;
 							int targetHeight = (barHeight
-									- ((int) e.getEnergy().getMaxEnergyStored() - (int) e.getEnergy().getEnergyStored())
-											* barHeight / (int) e.getEnergy().getMaxEnergyStored());
+									- ((int) e.energy.getMaxEnergyStored() - (int) e.energy.getEnergyStored())
+											* barHeight / (int) e.energy.getMaxEnergyStored());
 							drawUV(ui.left + 8, ui.top + 5 + (barHeight - targetHeight), 176, barHeight - targetHeight,
 									barWidth, targetHeight);
 							drawTooltip(ui.left + 8, ui.top + 5, barWidth, barHeight,
-									(int) e.getEnergy().getEnergyStored() + " DJ");
+									(int) e.energy.getEnergyStored() + " DJ");
 
 							int arrowWidth = 36;
 							int arrowHeight = 16;
@@ -106,11 +108,8 @@ public class BlockOxidizer extends ElectricMachine {
 							}
 						}
 					}.addScreenSwitch(22, 0, 23, 23, "Options"));
-					ui.addScreen(new UIScreen(ui, "Options") {
-						@Override
-						public void render(MachineTileEntity e, Object... args) {
-						}
-					}.addScreenSwitch(0, 0, 23, 23, "MainScreen"));
+					ui.addScreen(
+							new UIOptionsScreen(ui, FaceType.NONE, FaceType.ENERGY, FaceType.ITEM, FaceType.FLUID));
 					ui.setCurrentUIScreen("MainScreen");
 				}
 			};

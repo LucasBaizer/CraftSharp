@@ -1,10 +1,10 @@
 package com.kekcraft.api.ui;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.SerializationUtils;
@@ -12,6 +12,10 @@ import org.apache.commons.lang3.SerializationUtils;
 import com.kekcraft.ModPacket;
 import com.kekcraft.SerializableEntity;
 
+import cofh.api.transport.IItemDuct;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.ByteBufOutputStream;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -20,7 +24,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public abstract class MachineTileEntity extends TileEntity implements ISidedInventory, SerializableEntity {
+public abstract class MachineTileEntity extends TileEntity implements ISidedInventory, SerializableEntity, IItemDuct {
 	private boolean enableAutomaticUpdates = true;
 	private boolean changeMeta;
 	protected ItemStack[] slots;
@@ -31,16 +35,20 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 	protected int tickUpdateRate;
 	protected String inventoryName;
 	protected long cookTicks = 0;
-	protected List<IMachineRecipe> validRecipes = new ArrayList<IMachineRecipe>();
-	public HashMap<ForgeDirection, FaceType> faces = new HashMap<ForgeDirection, FaceType>();
-	public MachineUI ui;
+	protected ArrayList<IMachineRecipe> validRecipes = new ArrayList<IMachineRecipe>();
+	protected HashMap<ForgeDirection, FaceType> faces = new HashMap<ForgeDirection, FaceType>();
+	protected HashMap<MachineUpgrade, Integer> upgrades = new HashMap<MachineUpgrade, Integer>();
+	protected MachineUI ui;
 
 	public MachineTileEntity(int slots, int tickUpdateRate) {
 		this.slots = new ItemStack[slots];
 		this.tickUpdateRate = tickUpdateRate;
 
-		for (ForgeDirection dir : ForgeDirection.values()) {
+		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 			faces.put(dir, FaceType.NONE);
+		}
+		for (MachineUpgrade upgrade : MachineUpgrade.values()) {
+			upgrades.put(upgrade, 0);
 		}
 	}
 
@@ -49,23 +57,20 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 	}
 
 	protected void onSmeltingStopped() {
-		if (changeMeta) {
-			modifyMeta(-6);
-		}
 	}
 
 	protected void onSmeltingFinished() {
+		if (changeMeta) {
+			worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord,
+					worldObj.getBlockMetadata(xCoord, yCoord, zCoord) & 7, 2);
+		}
 	}
 
 	protected void onItemConsumeStart() {
 		if (changeMeta) {
-			modifyMeta(6);
+			worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord,
+					worldObj.getBlockMetadata(xCoord, yCoord, zCoord) | 8, 2);
 		}
-	}
-
-	private void modifyMeta(int x) {
-		worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord,
-				worldObj.getBlockMetadata(xCoord, yCoord, zCoord) + x, 2);
 	}
 
 	protected void onItemSmelted(IMachineRecipe item) {
@@ -358,6 +363,12 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 			this.faces.put(ForgeDirection.valueOf(tag.getString("Direction")), FaceType.valueOf(tag.getString("Face")));
 		}
 
+		NBTTagList upgrades = tagCompound.getTagList("Upgrades", 10);
+		for (int i = 0; i < upgrades.tagCount(); i++) {
+			NBTTagCompound tag = upgrades.getCompoundTagAt(i);
+			this.upgrades.put(MachineUpgrade.valueOf(tag.getString("Upgrade")), tag.getInteger("Amount"));
+		}
+
 		cookTime = tagCompound.getInteger("CookTime");
 		currentCookTime = tagCompound.getInteger("CurrentCookTime");
 
@@ -410,8 +421,16 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 			tag.setString("Face", entry.getValue().toString());
 			faceList.appendTag(tag);
 		}
-
 		tagCompound.setTag("Faces", faceList);
+
+		NBTTagList upgradeList = new NBTTagList();
+		for (Entry<MachineUpgrade, Integer> entry : upgrades.entrySet()) {
+			NBTTagCompound tag = new NBTTagCompound();
+			tag.setString("Upgrade", entry.getKey().toString());
+			tag.setInteger("Amount", entry.getValue());
+			upgradeList.appendTag(tag);
+		}
+		tagCompound.setTag("Upgrades", upgradeList);
 
 		if (this.hasCustomInventoryName()) {
 			tagCompound.setString("CustomName", getInventoryName());
@@ -435,5 +454,57 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 
 	public void setEnableAutomaticUpdates(boolean enableAutomaticUpdates) {
 		this.enableAutomaticUpdates = enableAutomaticUpdates;
+	}
+
+	@Override
+	public ItemStack insertItem(ForgeDirection from, ItemStack item) {
+		ItemStack copy = item.copy();
+		if (faces.get(from) == FaceType.ITEM) {
+			for (int slot : itemSlots) {
+				if (isItemValidForSlot(slot, copy)) {
+					int stackSize = slots[slot].stackSize;
+					slots[slot].stackSize = Math.min(64, stackSize + copy.stackSize);
+					copy.stackSize = Math.max(0, stackSize + copy.stackSize - 64);
+
+					if (copy.stackSize == 0) {
+						return null;
+					}
+				}
+			}
+		}
+		return copy;
+	}
+
+	@Override
+	public void read(ByteBufInputStream in) throws IOException {
+		currentCookTime = in.readInt();
+		cookTime = in.readInt();
+
+		for (int i = 0; i < faces.size(); i++) {
+			faces.put(ForgeDirection.values()[in.readInt()], FaceType.values()[in.readInt()]);
+		}
+		for (int i = 0; i < upgrades.size(); i++) {
+			upgrades.put(MachineUpgrade.values()[in.readInt()], in.readInt());
+		}
+	}
+
+	@Override
+	public void write(ByteBufOutputStream out) throws IOException {
+		out.writeInt(Minecraft.getMinecraft().theWorld.provider.dimensionId);
+		out.writeInt(xCoord);
+		out.writeInt(yCoord);
+		out.writeInt(zCoord);
+
+		out.writeInt(getCurrentCookTime());
+		out.writeInt(getCookTime());
+
+		for (Entry<ForgeDirection, FaceType> entry : faces.entrySet()) {
+			out.writeInt(entry.getKey().ordinal());
+			out.writeInt(entry.getValue().ordinal());
+		}
+		for (Entry<MachineUpgrade, Integer> entry : upgrades.entrySet()) {
+			out.writeInt(entry.getKey().ordinal());
+			out.writeInt(entry.getValue());
+		}
 	}
 }
