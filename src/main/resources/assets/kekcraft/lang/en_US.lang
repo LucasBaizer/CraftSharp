@@ -35,3 +35,7 @@ item.kekcraft_MachineCoreDiamond.name=Elite Machine Core
 item.kekcraft_MachineCoreEmerald.name=Ultimate Machine Core
 tile.kekcraft_BlockSilicon.name=Block of Silicon
 tile.kekcraft_BlockSteel.name=Block of Steel
+tile.kekcraft_BlockAluminum.name=Block of Aluminum
+item.kekcraft_UpgradeEnergy.name=Energy Efficiency Upgrade
+item.kekcraft_UpgradeFluid.name=Fluid Efficiency Upgrade
+item.kekcraft_UpgradeSpeed.name=Speed Upgrade

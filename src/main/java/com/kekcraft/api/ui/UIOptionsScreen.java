@@ -3,6 +3,7 @@ package com.kekcraft.api.ui;
 import static net.minecraftforge.common.util.ForgeDirection.*;
 
 import com.kekcraft.ModPacket;
+import com.kekcraft.api.ui.MachineContainer.InventorySlot;
 
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -14,6 +15,7 @@ public class UIOptionsScreen extends UIScreen {
 		super(ui, "Options");
 
 		addScreenSwitch(0, 0, 23, 23, "MainScreen");
+		addScreenSwitch(45, 0, 23, 23, "Upgrades");
 		addClickListener(80, 36, 16, 16, createRunnable(UP));
 		addClickListener(80, 74, 16, 16, createRunnable(DOWN));
 		addClickListener(61, 55, 16, 16, createRunnable(WEST));
@@ -21,6 +23,13 @@ public class UIOptionsScreen extends UIScreen {
 		addClickListener(61, 74, 16, 16, createRunnable(NORTH));
 
 		this.types = availableTypes;
+	}
+
+	@Override
+	public void load(MachineUI e) {
+		super.load(e);
+
+		e.allow.add(InventorySlot.class);
 	}
 
 	@Override

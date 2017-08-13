@@ -1,7 +1,7 @@
 package com.kekcraft.blocks.machines;
 
-import static net.minecraft.init.Blocks.stone;
-import static net.minecraft.init.Items.iron_ingot;
+import static net.minecraft.init.Blocks.*;
+import static net.minecraft.init.Items.*;
 
 import java.awt.Dimension;
 import java.util.Map;
@@ -18,8 +18,10 @@ import com.kekcraft.api.ui.ElectricMachineTileEntity;
 import com.kekcraft.api.ui.FaceType;
 import com.kekcraft.api.ui.MachineContainer;
 import com.kekcraft.api.ui.MachineTileEntity;
+import com.kekcraft.api.ui.MachineUpgrade;
+import com.kekcraft.api.ui.UIMainScreen;
 import com.kekcraft.api.ui.UIOptionsScreen;
-import com.kekcraft.api.ui.UIScreen;
+import com.kekcraft.api.ui.UIUpgradesScreen;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.material.Material;
@@ -57,23 +59,27 @@ public class BlockElectricFurnace extends ElectricMachine {
 
 		container.addSlotToContainer(container.createSlot(0, 56, 58));
 		container.addSlotToContainer(container.createOutputSlot(1, 116, 58));
+		container.addSlotToContainer(container.createUpgradeSlot(2, 96, 47));
+		container.addSlotToContainer(container.createUpgradeSlot(3, 96, 68));
 	}
 
 	public static class BlockElectricFurnaceTileEntity extends ElectricMachineTileEntity {
 		public BlockElectricFurnaceTileEntity() {
-			super(2, 5);
+			super(4, 5);
 
 			energy.setCapacity(100000);
 			energy.setMaxTransfer(128);
 			energy.setEnergyStored(KekCraft.ENERGY_MODE_DEV ? 100000 : 0);
 
-			setItemSlots(new int[] { 0 });
+			setItemSlots(new int[] { 0, 2, 3 });
 			setOutputSlots(new int[] { 1 });
+			setUpgradeSlots(new int[] { 2, 3 });
+			setValidUpgrades(new MachineUpgrade[] { MachineUpgrade.ENERGY_EFFICIENCY, MachineUpgrade.SPEED });
 
 			@SuppressWarnings("unchecked")
 			Map<ItemStack, ItemStack> recipes = FurnaceRecipes.smelting().getSmeltingList();
 			for (Entry<ItemStack, ItemStack> entry : recipes.entrySet()) {
-				addRecipe(new DefaultMachineRecipe(entry.getKey(), entry.getValue(), 50, 800, 0));
+				addRecipe(new DefaultMachineRecipe(entry.getKey(), entry.getValue(), 100, 800, 0));
 			}
 
 			setChangeMeta(true);
@@ -81,16 +87,15 @@ public class BlockElectricFurnace extends ElectricMachine {
 			onUISet = new Runnable() {
 				@Override
 				public void run() {
-					ui.addScreen(new UIScreen(ui, "MainScreen") {
+					ui.addScreen(new UIMainScreen(ui) {
 						@Override
 						public void render(MachineTileEntity m, Object... args) {
 							BlockElectricFurnaceTileEntity e = (BlockElectricFurnaceTileEntity) m;
 
 							int barWidth = 7;
 							int barHeight = 74;
-							int targetHeight = (barHeight
-									- (e.energy.getMaxEnergyStored() - e.energy.getEnergyStored()) * barHeight
-											/ e.energy.getMaxEnergyStored());
+							int targetHeight = (barHeight - (e.energy.getMaxEnergyStored() - e.energy.getEnergyStored())
+									* barHeight / e.energy.getMaxEnergyStored());
 							drawUV(ui.left + 8, ui.top + 28 + (barHeight - targetHeight), 176,
 									23 + barHeight - targetHeight, barWidth, targetHeight);
 							drawTooltip(ui.left + 8, ui.top + 27, barWidth, barHeight,
@@ -111,8 +116,9 @@ public class BlockElectricFurnace extends ElectricMachine {
 								drawTooltip(ui.left + 79, ui.top + 57, arrowWidth, arrowHeight, "0%");
 							}
 						}
-					}.addScreenSwitch(22, 0, 23, 23, "Options"));
+					});
 					ui.addScreen(new UIOptionsScreen(ui, FaceType.NONE, FaceType.ENERGY, FaceType.ITEM));
+					ui.addScreen(new UIUpgradesScreen(ui));
 					ui.setCurrentUIScreen("MainScreen");
 				}
 			};

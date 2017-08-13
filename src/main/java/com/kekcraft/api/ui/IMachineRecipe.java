@@ -7,7 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
 public interface IMachineRecipe extends Serializable {
-	public boolean satifies(ItemStack[] slots);
+	public boolean satifies(MachineTileEntity entity, ItemStack[] slots);
 
 	public boolean isValidElementOfRecipe(ItemStack element, int index);
 	
@@ -20,7 +20,7 @@ public interface IMachineRecipe extends Serializable {
 	public List<Integer> getRecipeSlots();
 
 	public int getCookTime();
-
+	
 	public int getFuelCost();
 	
 	public void writeToNBT(NBTTagCompound nbt);

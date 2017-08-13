@@ -7,11 +7,9 @@ import java.util.HashMap;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Slot;
 
-public class MachineUI extends GuiContainer {
+public class MachineUI extends GuiContainerModified {
 	public MachineTileEntity tileEntity;
 
 	public int left;
@@ -39,7 +37,16 @@ public class MachineUI extends GuiContainer {
 	}
 
 	public void setCurrentUIScreen(String name) {
-		currentScreen = screens.get(name);
+		if (screens.containsKey(name)) {
+			currentScreen = screens.get(name);
+			allow.clear();
+			disallow.clear();
+			currentScreen.load(this);
+		}
+	}
+	
+	public UIScreen getUIScreen(String name) {
+		return screens.get(name);
 	}
 
 	public UIScreen getCurrentUIScreen() {
@@ -72,36 +79,16 @@ public class MachineUI extends GuiContainer {
 	}
 
 	@Override
-	public void drawScreen(int par1, int par2, float par3) {
-		this.mouseX = par1;
-		this.mouseY = par2;
+	public void drawScreen(final int x, final int y, final float par3) {
+		this.mouseX = x;
+		this.mouseY = y;
 
-		if (!currentScreen.getName().equals("MainScreen")) {
-			@SuppressWarnings("unchecked")
-			ArrayList<Slot> copy = new ArrayList<Slot>(this.inventorySlots.inventorySlots);
-			for (int i = tileEntity.getSizeInventory(); i > 0; i--) {
-				this.inventorySlots.inventorySlots.remove(this.inventorySlots.inventorySlots.size() - 1);
-			}
-			super.drawScreen(par1, par2, par3);
-			this.inventorySlots.inventorySlots = copy;
-		} else {
-			super.drawScreen(par1, par2, par3);
-		}
+		MachineUI.super.drawScreen(x, y, par3);
 	}
 
 	@Override
-	protected void mouseClicked(int x, int y, int par3) {
-		if (!currentScreen.getName().equals("MainScreen")) {
-			@SuppressWarnings("unchecked")
-			ArrayList<Slot> copy = new ArrayList<Slot>(this.inventorySlots.inventorySlots);
-			for (int i = tileEntity.getSizeInventory(); i > 0; i--) {
-				this.inventorySlots.inventorySlots.remove(this.inventorySlots.inventorySlots.size() - 1);
-			}
-			super.mouseClicked(x, y, par3);
-			this.inventorySlots.inventorySlots = copy;
-		} else {
-			super.mouseClicked(x, y, par3);
-		}
+	protected void mouseClicked(final int x, final int y, final int par3) {
+		MachineUI.super.mouseClicked(x, y, par3);
 
 		for (ClickListener listener : clickListeners) {
 			if (listener.screen == currentScreen) {

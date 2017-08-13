@@ -1,8 +1,11 @@
 package com.kekcraft.api.ui;
 
+import com.kekcraft.items.KekCraftItemUpgrade;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotFurnace;
 import net.minecraft.item.ItemStack;
@@ -11,6 +14,7 @@ public class MachineContainer extends Container {
 	private MachineTileEntity tileEntity;
 	private InventoryPlayer inventory;
 	private int normalizer;
+	private int firstUpgradeIndex = -1;
 
 	public MachineContainer(InventoryPlayer inventory, Machine block, MachineTileEntity tileEntity) {
 		this.tileEntity = tileEntity;
@@ -19,8 +23,14 @@ public class MachineContainer extends Container {
 		block.drawTiles(this);
 	}
 
-	public Slot createSlot(final int index, int x, int y) {
-		return new Slot(tileEntity, index, x, normalize(y));
+	public Slot createSlot(int index, int x, int y) {
+		return new InputSlot(index, x, normalize(y));
+	}
+
+	public class InputSlot extends Slot {
+		public InputSlot(int p_i1824_2_, int p_i1824_3_, int p_i1824_4_) {
+			super(tileEntity, p_i1824_2_, p_i1824_3_, p_i1824_4_);
+		}
 	}
 
 	public int normalize(int x) {
@@ -29,6 +39,33 @@ public class MachineContainer extends Container {
 
 	public Slot createOutputSlot(int index, int x, int y) {
 		return new SlotFurnace(inventory.player, tileEntity, index, x, normalize(y));
+	}
+
+	public Slot createUpgradeSlot(int index, int x, int y) {
+		if (firstUpgradeIndex == -1) {
+			firstUpgradeIndex = index;
+		}
+		return new UpgradeSlot(index, x, normalize(y), index - firstUpgradeIndex);
+	}
+
+	public class UpgradeSlot extends Slot {
+		private int offset;
+
+		public UpgradeSlot(int index, int x, int y, int offset) {
+			super(tileEntity, index, x, y);
+			this.offset = offset;
+		}
+
+		@Override
+		public boolean isItemValid(ItemStack stack) {
+			for (int s : tileEntity.itemSlots) {
+				if (s == getSlotIndex()) {
+					return stack.getItem() instanceof KekCraftItemUpgrade
+							&& ((KekCraftItemUpgrade) stack.getItem()).getUpgrade() == tileEntity.validUpgrades[offset];
+				}
+			}
+			return false;
+		}
 	}
 
 	@Override
@@ -58,13 +95,19 @@ public class MachineContainer extends Container {
 
 		for (int i = 0; i < mainHeight; i++) {
 			for (int j = 0; j < perRow; j++) {
-				this.addSlotToContainer(
-						new Slot(inventory, j + (i * perRow) + perRow, x + (j * tileWidth), y + (i * tileHeight)));
+				this.addSlotToContainer(new InventorySlot(inventory, j + (i * perRow) + perRow, x + (j * tileWidth),
+						y + (i * tileHeight)));
 			}
 		}
 		for (int i = 0; i < perRow; i++) {
-			this.addSlotToContainer(
-					new Slot(inventory, i, x + (i * tileWidth), y + (tileHeight * mainHeight) + (mainHeight + 1)));
+			this.addSlotToContainer(new InventorySlot(inventory, i, x + (i * tileWidth),
+					y + (tileHeight * mainHeight) + (mainHeight + 1)));
+		}
+	}
+
+	public class InventorySlot extends Slot {
+		public InventorySlot(IInventory p_i1824_1_, int p_i1824_2_, int p_i1824_3_, int p_i1824_4_) {
+			super(p_i1824_1_, p_i1824_2_, p_i1824_3_, p_i1824_4_);
 		}
 	}
 

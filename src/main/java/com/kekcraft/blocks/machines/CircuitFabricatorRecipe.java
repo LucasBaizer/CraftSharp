@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.kekcraft.KekCraft;
 import com.kekcraft.api.ui.IMachineRecipe;
+import com.kekcraft.api.ui.MachineTileEntity;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -24,7 +25,7 @@ public class CircuitFabricatorRecipe implements IMachineRecipe {
 	}
 
 	@Override
-	public boolean satifies(ItemStack[] slots) {
+	public boolean satifies(MachineTileEntity entity, ItemStack[] slots) {
 		return has(slots[0], KekCraft.factory.getItem("RefinedSilicon")) && slots[1] != null
 				&& slots[1].getItem() == inputA.getItem() && slots[2] != null && slots[2].getItem() == inputB.getItem();
 	}
@@ -61,16 +62,6 @@ public class CircuitFabricatorRecipe implements IMachineRecipe {
 	}
 
 	@Override
-	public int getCookTime() {
-		return 400;
-	}
-
-	@Override
-	public int getFuelCost() {
-		return 3200;
-	}
-
-	@Override
 	public void writeToNBT(NBTTagCompound nbt) {
 		write(nbt, inputA, "InputA");
 		write(nbt, inputB, "InputB");
@@ -92,5 +83,15 @@ public class CircuitFabricatorRecipe implements IMachineRecipe {
 
 	private ItemStack read(NBTTagCompound nbt, String name) {
 		return ItemStack.loadItemStackFromNBT(nbt.getCompoundTag(name));
+	}
+
+	@Override
+	public int getCookTime() {
+		return 1600;
+	}
+
+	@Override
+	public int getFuelCost() {
+		return 3200;
 	}
 }

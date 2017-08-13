@@ -44,6 +44,8 @@ public abstract class UIScreen {
 	}
 
 	public abstract void render(MachineTileEntity e, Object... args);
+	
+	public void load(MachineUI e) {}
 
 	public ResourceLocation getBackgroundTexture(Machine block) {
 		return tex == null

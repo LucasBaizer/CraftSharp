@@ -15,6 +15,7 @@ import com.kekcraft.api.ui.Generator;
 import com.kekcraft.api.ui.GeneratorTileEntity;
 import com.kekcraft.api.ui.MachineContainer;
 import com.kekcraft.api.ui.MachineTileEntity;
+import com.kekcraft.api.ui.UIMainScreen;
 import com.kekcraft.api.ui.UIScreen;
 
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -94,7 +95,7 @@ public class BlockGeneratorCrankEngine extends Generator {
 			onUISet = new Runnable() {
 				@Override
 				public void run() {
-					ui.addScreen(new UIScreen(ui, "MainScreen") {
+					ui.addScreen(new UIMainScreen(ui) {
 						@Override
 						public void render(MachineTileEntity m, Object... args) {
 							ElectricMachineTileEntity e = (ElectricMachineTileEntity) m;

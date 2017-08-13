@@ -22,11 +22,15 @@ public abstract class ElectricMachineTileEntity extends MachineTileEntity
 	}
 
 	private int getEnergyCostPerCook(IMachineRecipe recipe) {
-		return recipe.getFuelCost() / recipe.getCookTime();
+		return (recipe.getFuelCost() * (getUpgrades(MachineUpgrade.SPEED) + 1)
+				/ (getUpgrades(MachineUpgrade.ENERGY_EFFICIENCY) + 1))
+				/ (recipe.getCookTime() / (getUpgrades(MachineUpgrade.SPEED) + 1));
 	}
 
 	@Override
 	public void updateEntity() {
+		super.updateEntity();
+
 		if (!this.worldObj.isRemote) {
 			if (canSmelt()) {
 				IMachineRecipe recipe = getNextRecipe();
@@ -47,7 +51,7 @@ public abstract class ElectricMachineTileEntity extends MachineTileEntity
 				}
 			}
 			if (isBurningRecipe()) {
-				if (!currentRecipe.satifies(slots)) {
+				if (!currentRecipe.satifies(this, slots)) {
 					reset();
 					onSmeltingStopped();
 					ModPacket.sendTileEntityUpdate(this);
@@ -128,14 +132,14 @@ public abstract class ElectricMachineTileEntity extends MachineTileEntity
 	}
 
 	@Override
-	public final void read(ByteBufInputStream in) throws IOException {
+	public void read(ByteBufInputStream in) throws IOException {
 		super.read(in);
 
 		energy.setEnergyStored(in.readInt());
 	}
 
 	@Override
-	public final void write(ByteBufOutputStream out) throws IOException {
+	public void write(ByteBufOutputStream out) throws IOException {
 		super.write(out);
 
 		out.writeInt(energy.getEnergyStored());

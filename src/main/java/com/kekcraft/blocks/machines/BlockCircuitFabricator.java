@@ -12,8 +12,10 @@ import com.kekcraft.api.ui.ElectricMachineTileEntity;
 import com.kekcraft.api.ui.FaceType;
 import com.kekcraft.api.ui.MachineContainer;
 import com.kekcraft.api.ui.MachineTileEntity;
+import com.kekcraft.api.ui.MachineUpgrade;
+import com.kekcraft.api.ui.UIMainScreen;
 import com.kekcraft.api.ui.UIOptionsScreen;
-import com.kekcraft.api.ui.UIScreen;
+import com.kekcraft.api.ui.UIUpgradesScreen;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.material.Material;
@@ -56,14 +58,18 @@ public class BlockCircuitFabricator extends ElectricMachine {
 		container.addSlotToContainer(container.createSlot(1, 56, 57));
 		container.addSlotToContainer(container.createSlot(2, 56, 80));
 		container.addSlotToContainer(container.createOutputSlot(3, 135, 58));
+		container.addSlotToContainer(container.createUpgradeSlot(4, 96, 47));
+		container.addSlotToContainer(container.createUpgradeSlot(5, 96, 68));
 	}
 
 	public static class BlockCircuitFabricatorTileEntity extends ElectricMachineTileEntity {
 		public BlockCircuitFabricatorTileEntity() {
-			super(4, 20);
+			super(6, 20);
 
-			setItemSlots(new int[] { 0, 1, 2 });
+			setItemSlots(new int[] { 0, 1, 2, 4, 5 });
 			setOutputSlots(new int[] { 3 });
+			setUpgradeSlots(new int[] { 4, 5 });
+			setValidUpgrades(new MachineUpgrade[] { MachineUpgrade.ENERGY_EFFICIENCY, MachineUpgrade.SPEED });
 
 			energy.setCapacity(100000);
 			energy.setMaxTransfer(128);
@@ -72,18 +78,14 @@ public class BlockCircuitFabricator extends ElectricMachine {
 			addRecipe(new CircuitFabricatorRecipe(new ItemStack(Items.redstone),
 					new ItemStack(KekCraft.factory.getItem("RefinedSilicon")),
 					KekCraft.factory.getItem("CircuitRedstone")));
-
 			addRecipe(new CircuitFabricatorRecipe(new ItemStack(Items.iron_ingot),
 					new ItemStack(KekCraft.factory.getItem("CircuitRedstone")),
 					KekCraft.factory.getItem("CircuitIron")));
-
 			addRecipe(new CircuitFabricatorRecipe(new ItemStack(Items.gold_ingot),
 					new ItemStack(KekCraft.factory.getItem("CircuitIron")), KekCraft.factory.getItem("CircuitGold")));
-
 			addRecipe(new CircuitFabricatorRecipe(new ItemStack(Items.diamond),
 					new ItemStack(KekCraft.factory.getItem("CircuitGold")),
 					KekCraft.factory.getItem("CircuitDiamond")));
-
 			addRecipe(new CircuitFabricatorRecipe(new ItemStack(Items.emerald),
 					new ItemStack(KekCraft.factory.getItem("CircuitDiamond")),
 					KekCraft.factory.getItem("CircuitEmerald")));
@@ -93,16 +95,15 @@ public class BlockCircuitFabricator extends ElectricMachine {
 			onUISet = new Runnable() {
 				@Override
 				public void run() {
-					ui.addScreen(new UIScreen(ui, "MainScreen") {
+					ui.addScreen(new UIMainScreen(ui) {
 						@Override
 						public void render(MachineTileEntity m, Object... args) {
 							BlockCircuitFabricatorTileEntity e = (BlockCircuitFabricatorTileEntity) m;
 
 							int barWidth = 7;
 							int barHeight = 74;
-							int targetHeight = (barHeight
-									- (e.energy.getMaxEnergyStored() - e.energy.getEnergyStored()) * barHeight
-											/ e.energy.getMaxEnergyStored());
+							int targetHeight = (barHeight - (e.energy.getMaxEnergyStored() - e.energy.getEnergyStored())
+									* barHeight / e.energy.getMaxEnergyStored());
 							drawUV(ui.left + 26, ui.top + 29 + (barHeight - targetHeight), 176,
 									23 + barHeight - targetHeight, barWidth, targetHeight);
 							drawTooltip(ui.left + 26, ui.top + 29, barWidth, barHeight,
@@ -123,8 +124,9 @@ public class BlockCircuitFabricator extends ElectricMachine {
 								drawTooltip(ui.left + 79, ui.top + 57, arrowWidth, arrowHeight, "0%");
 							}
 						}
-					}.addScreenSwitch(22, 0, 23, 23, "Options"));
+					});
 					ui.addScreen(new UIOptionsScreen(ui, FaceType.NONE, FaceType.ENERGY, FaceType.ITEM));
+					ui.addScreen(new UIUpgradesScreen(ui));
 					ui.setCurrentUIScreen("MainScreen");
 				}
 			};

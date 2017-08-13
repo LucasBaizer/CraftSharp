@@ -40,7 +40,7 @@ public abstract class FuelMachineTileEntity extends MachineTileEntity {
 				return true;
 			} else {
 				for (IMachineRecipe recipe : validRecipes) {
-					if (recipe.satifies(slots)) {
+					if (recipe.satifies(this, slots)) {
 						return true;
 					}
 				}
@@ -63,6 +63,8 @@ public abstract class FuelMachineTileEntity extends MachineTileEntity {
 
 	@Override
 	public void updateEntity() {
+		super.updateEntity();
+
 		if (!this.worldObj.isRemote) {
 			if (canAcceptFuel()) {
 				IMachineFuel fuel = getNextFuel();
@@ -71,8 +73,9 @@ public abstract class FuelMachineTileEntity extends MachineTileEntity {
 					if (slots[fuel.getFuelSlot()].stackSize == 0) {
 						slots[fuel.getFuelSlot()] = null;
 					}
-					burnTime = fuel.getBurnTime();
-					currentBurnTime = fuel.getBurnTime();
+					int burnTime = fuel.getBurnTime() / (getUpgrades(MachineUpgrade.SPEED) + 1);
+					this.burnTime = burnTime;
+					this.currentBurnTime = burnTime;
 				}
 			}
 			if (canSmelt()) {
@@ -83,7 +86,7 @@ public abstract class FuelMachineTileEntity extends MachineTileEntity {
 				}
 			}
 			if (isBurningRecipe()) {
-				if (currentBurnTime == 0 || !currentRecipe.satifies(slots)) {
+				if (currentBurnTime == 0 || !currentRecipe.satifies(this, slots)) {
 					reset();
 					onSmeltingStopped();
 					ModPacket.sendTileEntityUpdate(this);
@@ -144,7 +147,7 @@ public abstract class FuelMachineTileEntity extends MachineTileEntity {
 	@Override
 	public void read(ByteBufInputStream in) throws IOException {
 		super.read(in);
-		
+
 		currentBurnTime = in.readInt();
 		burnTime = in.readInt();
 	}
@@ -152,7 +155,7 @@ public abstract class FuelMachineTileEntity extends MachineTileEntity {
 	@Override
 	public void write(ByteBufOutputStream out) throws IOException {
 		super.write(out);
-		
+
 		out.writeInt(getCurrentBurnTime());
 		out.writeInt(getBurnTime());
 	}

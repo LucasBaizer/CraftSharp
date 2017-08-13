@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -29,6 +30,7 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 	private boolean changeMeta;
 	protected ItemStack[] slots;
 	protected int[] itemSlots;
+	protected int[] upgradeSlots = new int[0];
 	protected int[] outputSlots;
 	protected int cookTime;
 	protected int currentCookTime;
@@ -37,7 +39,6 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 	protected long cookTicks = 0;
 	protected ArrayList<IMachineRecipe> validRecipes = new ArrayList<IMachineRecipe>();
 	protected HashMap<ForgeDirection, FaceType> faces = new HashMap<ForgeDirection, FaceType>();
-	protected HashMap<MachineUpgrade, Integer> upgrades = new HashMap<MachineUpgrade, Integer>();
 	protected MachineUI ui;
 
 	public MachineTileEntity(int slots, int tickUpdateRate) {
@@ -46,9 +47,6 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 			faces.put(dir, FaceType.NONE);
-		}
-		for (MachineUpgrade upgrade : MachineUpgrade.values()) {
-			upgrades.put(upgrade, 0);
 		}
 	}
 
@@ -111,6 +109,20 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 
 	public MachineTileEntity setItemSlots(int[] itemSlots) {
 		this.itemSlots = itemSlots;
+		return this;
+	}
+
+	public MachineTileEntity setUpgradeSlots(int[] upgradeSlots) {
+		this.upgradeSlots = upgradeSlots;
+		return this;
+	}
+
+	public int[] getUpgradeSlots() {
+		return upgradeSlots;
+	}
+
+	public MachineTileEntity setValidUpgrades(MachineUpgrade[] upgrades) {
+		this.validUpgrades = upgrades;
 		return this;
 	}
 
@@ -188,6 +200,17 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 		return currentCookTime;
 	}
 
+	public int getUpgrades(MachineUpgrade upgrade) {
+		if (validUpgrades.length > 0 && upgradeSlots.length > 0) {
+			int index = Arrays.asList(validUpgrades).indexOf(upgrade);
+			if (index != -1 && index + upgradeSlots[0] < slots.length) {
+				ItemStack slot = slots[index + upgradeSlots[0]];
+				return slot == null ? 0 : slot.stackSize;
+			}
+		}
+		return 0;
+	}
+
 	@Override
 	public String getInventoryName() {
 		return hasCustomInventoryName() ? inventoryName : "";
@@ -212,7 +235,7 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 
 	protected IMachineRecipe getNextRecipe() {
 		for (IMachineRecipe recipe : validRecipes) {
-			if (recipe.satifies(slots)) {
+			if (recipe.satifies(this, slots)) {
 				return recipe;
 			}
 		}
@@ -248,6 +271,7 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 
 	protected IMachineRecipe currentRecipe;
 	protected int targetSlot;
+	public MachineUpgrade[] validUpgrades = new MachineUpgrade[0];
 
 	public IMachineRecipe getCurrentRecipe() {
 		return currentRecipe;
@@ -258,9 +282,11 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 
 		int slot = getAvailableOutputSlot(recipe.getOutput());
 		if (slot != -1) {
+			int time = recipe.getCookTime() / (getUpgrades(MachineUpgrade.SPEED) + 1);
+
 			currentRecipe = recipe;
-			cookTime = recipe.getCookTime();
-			currentCookTime = recipe.getCookTime();
+			cookTime = time;
+			currentCookTime = time;
 			targetSlot = slot;
 		}
 		return slot != -1;
@@ -286,7 +312,8 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 				}
 			}
 		} catch (NullPointerException e) {
-			System.out.println("NullPointerException thrown when finishing smelt!");
+			e.printStackTrace();
+			System.err.println("NullPointerException thrown when finishing smelt!");
 			return;
 		}
 	}
@@ -324,8 +351,7 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 
 	@Override
 	public int[] getAccessibleSlotsFromSide(int side) {
-		// TODO
-		return null;
+		return faces.get(ForgeDirection.getOrientation(side)) == FaceType.ITEM ? itemSlots : null;
 	}
 
 	@Override
@@ -335,12 +361,13 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 
 	@Override
 	public boolean canExtractItem(int par1, ItemStack stack, int par3) {
-		// return canInsertItem(par1, stack, par3);
-		return false;
+		return canInsertItem(par1, stack, par3);
 	}
 
 	@Override
-	public abstract void updateEntity();
+	public void updateEntity() {
+		super.updateEntity();
+	}
 
 	@Override
 	public void readFromNBT(NBTTagCompound tagCompound) {
@@ -361,12 +388,6 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 		for (int i = 0; i < faces.tagCount(); i++) {
 			NBTTagCompound tag = faces.getCompoundTagAt(i);
 			this.faces.put(ForgeDirection.valueOf(tag.getString("Direction")), FaceType.valueOf(tag.getString("Face")));
-		}
-
-		NBTTagList upgrades = tagCompound.getTagList("Upgrades", 10);
-		for (int i = 0; i < upgrades.tagCount(); i++) {
-			NBTTagCompound tag = upgrades.getCompoundTagAt(i);
-			this.upgrades.put(MachineUpgrade.valueOf(tag.getString("Upgrade")), tag.getInteger("Amount"));
 		}
 
 		cookTime = tagCompound.getInteger("CookTime");
@@ -423,15 +444,6 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 		}
 		tagCompound.setTag("Faces", faceList);
 
-		NBTTagList upgradeList = new NBTTagList();
-		for (Entry<MachineUpgrade, Integer> entry : upgrades.entrySet()) {
-			NBTTagCompound tag = new NBTTagCompound();
-			tag.setString("Upgrade", entry.getKey().toString());
-			tag.setInteger("Amount", entry.getValue());
-			upgradeList.appendTag(tag);
-		}
-		tagCompound.setTag("Upgrades", upgradeList);
-
 		if (this.hasCustomInventoryName()) {
 			tagCompound.setString("CustomName", getInventoryName());
 		}
@@ -483,9 +495,6 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 		for (int i = 0; i < faces.size(); i++) {
 			faces.put(ForgeDirection.values()[in.readInt()], FaceType.values()[in.readInt()]);
 		}
-		for (int i = 0; i < upgrades.size(); i++) {
-			upgrades.put(MachineUpgrade.values()[in.readInt()], in.readInt());
-		}
 	}
 
 	@Override
@@ -501,10 +510,6 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 		for (Entry<ForgeDirection, FaceType> entry : faces.entrySet()) {
 			out.writeInt(entry.getKey().ordinal());
 			out.writeInt(entry.getValue().ordinal());
-		}
-		for (Entry<MachineUpgrade, Integer> entry : upgrades.entrySet()) {
-			out.writeInt(entry.getKey().ordinal());
-			out.writeInt(entry.getValue());
 		}
 	}
 }

@@ -5,26 +5,27 @@ import java.util.List;
 
 import com.kekcraft.KekCraft;
 import com.kekcraft.api.ui.IMachineRecipe;
+import com.kekcraft.api.ui.MachineTileEntity;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class DualSlotRecipe implements IMachineRecipe {
+public class HighTemperatureAlloyFurnaceRecipe implements IMachineRecipe {
 	private static final long serialVersionUID = -8206894167646765940L;
 
 	private transient ItemStack a;
 	private transient ItemStack b;
 	private transient ItemStack out;
-	private int cost;
+	private int cost = -1;
 
-	public DualSlotRecipe(ItemStack a, ItemStack b, ItemStack out, int cost) {
+	public HighTemperatureAlloyFurnaceRecipe(ItemStack a, ItemStack b, ItemStack out) {
 		this.a = a;
 		this.b = b;
 		this.out = out;
 	}
 
 	@Override
-	public boolean satifies(ItemStack[] slots) {
+	public boolean satifies(MachineTileEntity entity, ItemStack[] slots) {
 		return satifies0(a, slots[0], b, slots[1]) || satifies0(a, slots[1], b, slots[0]);
 	}
 
@@ -60,16 +61,6 @@ public class DualSlotRecipe implements IMachineRecipe {
 	}
 
 	@Override
-	public int getCookTime() {
-		return 200;
-	}
-
-	@Override
-	public int getFuelCost() {
-		return cost;
-	}
-
-	@Override
 	public void writeToNBT(NBTTagCompound nbt) {
 		write(nbt, a, "InputA");
 		write(nbt, b, "InputB");
@@ -91,5 +82,15 @@ public class DualSlotRecipe implements IMachineRecipe {
 
 	private ItemStack read(NBTTagCompound nbt, String name) {
 		return ItemStack.loadItemStackFromNBT(nbt.getCompoundTag(name));
+	}
+
+	@Override
+	public int getCookTime() {
+		return 200;
+	}
+
+	@Override
+	public int getFuelCost() {
+		return cost;
 	}
 }

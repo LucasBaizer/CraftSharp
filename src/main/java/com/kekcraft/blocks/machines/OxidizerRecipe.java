@@ -3,13 +3,13 @@ package com.kekcraft.blocks.machines;
 import java.util.Arrays;
 import java.util.List;
 
-import com.kekcraft.api.ui.IMachineRecipe;
+import com.kekcraft.api.ui.IFluidMachineRecipe;
+import com.kekcraft.api.ui.MachineTileEntity;
 
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class OxidizerRecipe implements IMachineRecipe {
+public class OxidizerRecipe implements IFluidMachineRecipe {
 	private static final long serialVersionUID = -9181074539523858357L;
 
 	private transient ItemStack in;
@@ -21,19 +21,18 @@ public class OxidizerRecipe implements IMachineRecipe {
 	}
 
 	@Override
-	public boolean satifies(ItemStack[] slots) {
-		return slots[1] != null && slots[1].getItem() == Items.water_bucket && slots[0] != null
-				&& slots[0].getItem() == in.getItem() && slots[0].stackSize >= in.stackSize;
+	public boolean satifies(MachineTileEntity entity, ItemStack[] slots) {
+		return slots[0] != null && (slots[0].getItem() == in.getItem()) && slots[0].stackSize >= in.stackSize;
 	}
 
 	@Override
 	public boolean isValidElementOfRecipe(ItemStack element, int index) {
-		return index == 1 ? (element.getItem() == Items.water_bucket) : (element.getItem() == in.getItem());
+		return element.getItem() == in.getItem();
 	}
 
 	@Override
 	public ItemStack getInput(int slot) {
-		return slot == 0 ? in : new ItemStack(Items.water_bucket);
+		return slot == 0 ? in : null;
 	}
 
 	@Override
@@ -44,16 +43,6 @@ public class OxidizerRecipe implements IMachineRecipe {
 	@Override
 	public List<Integer> getRecipeSlots() {
 		return Arrays.asList(0);
-	}
-
-	@Override
-	public int getCookTime() {
-		return 800;
-	}
-
-	@Override
-	public int getFuelCost() {
-		return 1600;
 	}
 
 	@Override
@@ -77,5 +66,20 @@ public class OxidizerRecipe implements IMachineRecipe {
 	@Override
 	public boolean isInstant() {
 		return false;
+	}
+
+	@Override
+	public int getCookTime() {
+		return 1000;
+	}
+
+	@Override
+	public int getFuelCost() {
+		return 2000;
+	}
+
+	@Override
+	public int getFluidCost() {
+		return 1000;
 	}
 }

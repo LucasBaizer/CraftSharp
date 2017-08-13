@@ -29,7 +29,7 @@ public class DefaultMachineRecipe implements IMachineRecipe {
 	}
 
 	@Override
-	public boolean satifies(ItemStack[] slots) {
+	public boolean satifies(MachineTileEntity entity, ItemStack[] slots) {
 		return slots[inputSlot] != null && slots[inputSlot].getItem() == in.getItem()
 				&& slots[inputSlot].stackSize >= in.stackSize;
 	}

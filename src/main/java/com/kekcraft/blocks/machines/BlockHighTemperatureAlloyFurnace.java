@@ -1,6 +1,6 @@
 package com.kekcraft.blocks.machines;
 
-import static net.minecraft.init.Items.lava_bucket;
+import static net.minecraft.init.Items.*;
 
 import java.awt.Dimension;
 
@@ -15,8 +15,10 @@ import com.kekcraft.api.ui.FuelMachineFuel;
 import com.kekcraft.api.ui.FuelMachineTileEntity;
 import com.kekcraft.api.ui.MachineContainer;
 import com.kekcraft.api.ui.MachineTileEntity;
+import com.kekcraft.api.ui.MachineUpgrade;
+import com.kekcraft.api.ui.UIMainScreen;
 import com.kekcraft.api.ui.UIOptionsScreen;
-import com.kekcraft.api.ui.UIScreen;
+import com.kekcraft.api.ui.UIUpgradesScreen;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.material.Material;
@@ -38,10 +40,10 @@ public class BlockHighTemperatureAlloyFurnace extends FuelMachine {
 		RecipeHandler.FUTURES.add(new Runnable() {
 			@Override
 			public void run() {
-				GameRegistry.addRecipe(new ShapedOreRecipe(
-						new ItemStack(KekCraft.factory.getBlock("HighTemperatureAlloyFurnace")), "AAA", "BCB", "DED",
-						'A', lava_bucket, 'B', "gearIron", 'C', KekCraft.factory.getItem("MachineCore"), 'D',
-						KekCraft.factory.getItem("IngotSteel"), 'E', KekCraft.factory.getBlock("BlockSteel")));
+				GameRegistry.addRecipe(
+						new ShapedOreRecipe(new ItemStack(KekCraft.factory.getBlock("HighTemperatureAlloyFurnace")),
+								"AAA", "BCB", "DED", 'A', lava_bucket, 'B', "gearIron", 'C',
+								KekCraft.factory.getItem("MachineCore"), 'D', "ingotSteel", 'E', "blockSteel"));
 			}
 		});
 
@@ -71,30 +73,33 @@ public class BlockHighTemperatureAlloyFurnace extends FuelMachine {
 		slot.setBackgroundIcon(KekCraft.factory.getItem("DustThermite").getIconFromDamage(0));
 		container.addSlotToContainer(slot);
 		container.addSlotToContainer(container.createOutputSlot(3, 135, 58));
+		container.addSlotToContainer(container.createUpgradeSlot(4, 96, 58));
 	}
 
 	public static class BlockHighTemperatureAlloyFurnaceTileEntity extends FuelMachineTileEntity {
 		public BlockHighTemperatureAlloyFurnaceTileEntity() {
-			super(4, 5);
+			super(5, 5);
 
-			setItemSlots(new int[] { 0, 1 });
+			setItemSlots(new int[] { 0, 1, 4 });
 			setFuelSlots(new int[] { 2 });
 			setOutputSlots(new int[] { 3 });
+			setUpgradeSlots(new int[] { 4 });
 
 			addFuel(new FuelMachineFuel(new ItemStack(KekCraft.factory.getItem("DustThermite")), 200, 2));
-			addRecipe(new DualSlotRecipe(new ItemStack(Blocks.sand),
+			addRecipe(new HighTemperatureAlloyFurnaceRecipe(new ItemStack(Blocks.sand),
 					new ItemStack(KekCraft.factory.getItem("DustMagnesium")),
-					new ItemStack(KekCraft.factory.getItem("Silicon")), -1));
-			addRecipe(new DualSlotRecipe(new ItemStack(KekCraft.factory.getItem("Silicon")),
+					new ItemStack(KekCraft.factory.getItem("Silicon"))));
+			addRecipe(new HighTemperatureAlloyFurnaceRecipe(new ItemStack(KekCraft.factory.getItem("Silicon")),
 					new ItemStack(KekCraft.factory.getItem("Silicon")),
-					new ItemStack(KekCraft.factory.getItem("RefinedSilicon"), 2), -1));
+					new ItemStack(KekCraft.factory.getItem("RefinedSilicon"), 2)));
 
 			setChangeMeta(true);
+			setValidUpgrades(new MachineUpgrade[] { MachineUpgrade.SPEED });
 
 			onUISet = new Runnable() {
 				@Override
 				public void run() {
-					ui.addScreen(new UIScreen(ui, "MainScreen") {
+					ui.addScreen(new UIMainScreen(ui) {
 						@Override
 						public void render(MachineTileEntity m, Object... args) {
 							int flameWidth = 13;
@@ -118,15 +123,15 @@ public class BlockHighTemperatureAlloyFurnace extends FuelMachine {
 									width = 0;
 								}
 								drawUV(ui.left + 80, ui.top + 57, 176, 37, width, arrowHeight);
-								drawTooltip(ui.left + 80, ui.top + 57, arrowWidth, arrowHeight,
-										(int) ((Math.abs(e.getCurrentCookTime() - 200) / (double) e.getCookTime())
-												* 100) + "%");
+								drawTooltip(ui.left + 80, ui.top + 57, arrowWidth, arrowHeight, 100
+										- ((int) ((e.getCurrentCookTime() / (double) e.getCookTime()) * 100)) + "%");
 							} else {
 								drawTooltip(ui.left + 80, ui.top + 57, arrowWidth, arrowHeight, "0%");
 							}
 						}
 					}.addScreenSwitch(22, 0, 23, 23, "Options"));
-					ui.addScreen(new UIOptionsScreen(ui, FaceType.NONE, FaceType.ENERGY, FaceType.ITEM));
+					ui.addScreen(new UIOptionsScreen(ui, FaceType.NONE, FaceType.ITEM));
+					ui.addScreen(new UIUpgradesScreen(ui));
 					ui.setCurrentUIScreen("MainScreen");
 				}
 			};

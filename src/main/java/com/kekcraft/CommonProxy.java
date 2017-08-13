@@ -24,6 +24,7 @@ import com.kekcraft.blocks.machines.BlockOxidizer;
 import com.kekcraft.cmd.DoxCommand;
 import com.kekcraft.items.KekCraftItem;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -62,7 +63,7 @@ public class CommonProxy {
 
 		Tabs.initialize(factory);
 		try {
-			instantiate("com.kekcraft.items", "KekCraftItem");
+			instantiate("com.kekcraft.items", "KekCraftItem", "KekCraftItemUpgrade");
 			instantiate("com.kekcraft.blocks", "KekCraftBlockOre", "ParticleFX", "KekCraftBlock",
 					"OreGenerationHandler");
 			for (Item item : KekCraftItem.ITEMS) {
@@ -76,6 +77,8 @@ public class CommonProxy {
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			System.err.println("There was an error instantiating KekCraft items/blocks.");
+			FMLCommonHandler.instance().exitJava(1, true);
 		}
 		registerMachine(new BlockElectricFurnace(factory));
 		registerMachine(new BlockGeneratorCrankEngine(factory));
