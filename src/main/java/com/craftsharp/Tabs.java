@@ -9,7 +9,7 @@ public class Tabs {
 	public static CreativeTabs DEFAULT;
 
 	public static void initialize(final GameFactory factory) {
-		DEFAULT = new CreativeTabs("KekCraft") {
+		DEFAULT = new CreativeTabs("CraftSharp") {
 			@Override
 			public Item getTabIconItem() {
 				return Item.getItemFromBlock(factory.getBlock("ElectricFurnace"));

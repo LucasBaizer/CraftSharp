@@ -7,7 +7,7 @@ import com.craftsharp.RecipeHandler;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
-public class RodSteel extends KekCraftItem {
+public class RodSteel extends CraftSharpItem {
 	public RodSteel() {
 		super("RodSteel");
 		DictionaryHandler.register("rodSteel", this);

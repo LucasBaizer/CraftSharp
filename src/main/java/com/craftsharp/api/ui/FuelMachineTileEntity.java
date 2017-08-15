@@ -89,6 +89,9 @@ public abstract class FuelMachineTileEntity extends MachineTileEntity {
 				if (currentBurnTime == 0 || !currentRecipe.satifies(this, slots)) {
 					reset();
 					onSmeltingStopped();
+					if (getNextRecipe() == null) {
+						onSmeltingFinished();
+					}
 					ModPacket.sendTileEntityUpdate(this);
 				} else {
 					currentCookTime--;

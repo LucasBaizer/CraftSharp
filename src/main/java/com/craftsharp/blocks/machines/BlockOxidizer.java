@@ -111,7 +111,7 @@ public class BlockOxidizer extends ElectricMachine {
 									* barHeight / e.energy.getMaxEnergyStored());
 							drawUV(ui.left + 7, ui.top + 28 + (barHeight - targetHeight), 176,
 									23 + barHeight - targetHeight, barWidth, targetHeight);
-							drawTooltip(ui.left + 7, ui.top + 27, barWidth, barHeight,
+							drawTooltip(ui.left + 7, ui.top + 28, barWidth, barHeight,
 									e.energy.getEnergyStored() + " RF");
 
 							int liquidWidth = 7;
@@ -121,7 +121,7 @@ public class BlockOxidizer extends ElectricMachine {
 											/ e.fluid.getCapacity());
 							drawUV(ui.left + 18, ui.top + 28 + (liquidHeight - targetLiquidHeight), 183,
 									23 + liquidHeight - targetLiquidHeight, liquidWidth, targetLiquidHeight);
-							drawTooltip(ui.left + 18, ui.top + 27, liquidWidth, liquidHeight,
+							drawTooltip(ui.left + 18, ui.top + 28, liquidWidth, liquidHeight,
 									(int) e.fluid.getFluidStored() + " ML");
 
 							int arrowWidth = 36;

@@ -4,7 +4,7 @@ import com.craftsharp.api.ui.MachineUpgrade;
 
 import net.minecraft.init.Items;
 
-public class ItemUpgradeSpeed extends KekCraftItemUpgrade {
+public class ItemUpgradeSpeed extends CraftSharpItemUpgrade {
 	public ItemUpgradeSpeed() {
 		super("UpgradeSpeed", Items.redstone);
 	}

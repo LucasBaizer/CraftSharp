@@ -4,7 +4,7 @@ import com.craftsharp.RecipeHandler;
 
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
-public class ItemMachineCoreRedstone extends KekCraftItem {
+public class ItemMachineCoreRedstone extends CraftSharpItem {
 	public ItemMachineCoreRedstone() {
 		super("MachineCoreRedstone");
 		RecipeHandler.RECIPES

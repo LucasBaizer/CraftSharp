@@ -54,8 +54,8 @@ public class MachineUI extends GuiContainerModified {
 	}
 
 	void drawTooltip(int x, int y, int width, int height, String text) {
-		if (mouseX > x && mouseX < x + width) {
-			if (mouseY > y && mouseY < y + height) {
+		if (mouseX >= x && mouseX < x + width) {
+			if (mouseY >= y && mouseY < y + height) {
 				this.func_146283_a(Arrays.asList(new String[] { text }), mouseX, mouseY);
 			}
 		}

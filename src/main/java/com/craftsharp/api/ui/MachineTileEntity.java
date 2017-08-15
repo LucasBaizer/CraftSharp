@@ -267,7 +267,7 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 	}
 
 	protected boolean isReady() {
-		return !isEmpty(itemSlots) && currentCookTime <= 0;
+		return currentCookTime <= 0 && !isEmpty(itemSlots);
 	}
 
 	protected IMachineRecipe currentRecipe;

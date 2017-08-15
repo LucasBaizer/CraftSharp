@@ -9,8 +9,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
-public abstract class KekCraftItemUpgrade extends KekCraftItem {
-	public KekCraftItemUpgrade(final String name, final Item recipeItem) {
+public abstract class CraftSharpItemUpgrade extends CraftSharpItem {
+	public CraftSharpItemUpgrade(final String name, final Item recipeItem) {
 		super(name);
 
 		setMaxStackSize(8);

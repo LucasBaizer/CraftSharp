@@ -3,11 +3,13 @@ package com.craftsharp;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.common.MinecraftForge;
 
 public class ClientProxy extends CommonProxy {
 	public void preInit(FMLPreInitializationEvent e) {
 		super.preInit(e);
-
+		
+		MinecraftForge.EVENT_BUS.register(new CraftSharpRenderer());
 		CraftSharp.channel.register(new ClientPacketHandler());
 	}
 

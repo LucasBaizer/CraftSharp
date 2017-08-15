@@ -1,10 +1,10 @@
 [
 {
-  "modid": "kekcraft",
-  "name": "KekCraft",
-  "description": "KekCraft, general purpose tech mod!.",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
+  "modid": "craftsharp",
+  "name": "Craft#",
+  "description": "Craft#, the general-purpose Minecraft tech mod!",
+  "version": "1.0.0",
+  "mcversion": "1.7.10",
   "url": "",
   "updateUrl": "",
   "authorList": ["GoodZucc"],

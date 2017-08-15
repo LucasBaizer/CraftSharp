@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
-public class BlockSilicon extends KekCraftBlock {
+public class BlockSilicon extends CraftSharpBlock {
 	public BlockSilicon() {
 		super(Material.glass, "BlockSilicon");
 		DictionaryHandler.register("blockSilicon", this);
@@ -26,6 +26,6 @@ public class BlockSilicon extends KekCraftBlock {
 
 		setHardness(2f);
 		setResistance(0f);
-		setHarvestLevel("pickaxe", KekCraftBlock.STONE);
+		setHarvestLevel("pickaxe", CraftSharpBlock.STONE);
 	}
 }

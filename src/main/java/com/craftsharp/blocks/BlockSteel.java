@@ -1,7 +1,7 @@
 package com.craftsharp.blocks;
 
-import com.craftsharp.DictionaryHandler;
 import com.craftsharp.CraftSharp;
+import com.craftsharp.DictionaryHandler;
 import com.craftsharp.RecipeHandler;
 
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
-public class BlockSteel extends KekCraftBlock {
+public class BlockSteel extends CraftSharpBlock {
 	public BlockSteel() {
 		super(Material.iron, "BlockSteel");
 		DictionaryHandler.register("blockSteel", this);
@@ -27,6 +27,6 @@ public class BlockSteel extends KekCraftBlock {
 
 		setHardness(5f);
 		setResistance(1000f);
-		setHarvestLevel("pickaxe", KekCraftBlock.IRON);
+		setHarvestLevel("pickaxe", CraftSharpBlock.IRON);
 	}
 }

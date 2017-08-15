@@ -24,7 +24,7 @@ public class CraftSharp implements ForgeMod {
 	@Instance
 	public static CraftSharp modInstance;
 
-	@SidedProxy(clientSide = "com.kekcraft.ClientProxy", serverSide = "com.kekcraft.CommonProxy")
+	@SidedProxy(clientSide = "com.craftsharp.ClientProxy", serverSide = "com.craftsharp.CommonProxy")
 	public static CommonProxy proxy;
 
 	public static GameFactory factory;

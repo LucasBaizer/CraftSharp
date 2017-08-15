@@ -1,6 +1,6 @@
 package com.craftsharp.api.ui;
 
-import com.craftsharp.items.KekCraftItemUpgrade;
+import com.craftsharp.items.CraftSharpItemUpgrade;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -60,8 +60,8 @@ public class MachineContainer extends Container {
 		public boolean isItemValid(ItemStack stack) {
 			for (int s : tileEntity.itemSlots) {
 				if (s == getSlotIndex()) {
-					return stack.getItem() instanceof KekCraftItemUpgrade
-							&& ((KekCraftItemUpgrade) stack.getItem()).getUpgrade() == tileEntity.validUpgrades[offset];
+					return stack.getItem() instanceof CraftSharpItemUpgrade
+							&& ((CraftSharpItemUpgrade) stack.getItem()).getUpgrade() == tileEntity.validUpgrades[offset];
 				}
 			}
 			return false;

@@ -11,8 +11,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public class UIOptionsScreen extends UIScreen {
 	private HashMap<ForgeDirection, Integer> directionXMap = new HashMap<ForgeDirection, Integer>();
+	private HashMap<ForgeDirection, FaceType[]> types = new HashMap<ForgeDirection, FaceType[]>();
 	private MachineTileEntity entity;
-	private FaceType[] types;
 
 	public UIOptionsScreen(MachineUI ui, FaceType... availableTypes) {
 		super(ui, "Options");
@@ -27,13 +27,18 @@ public class UIOptionsScreen extends UIScreen {
 
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 			directionXMap.put(dir, 176);
+			types.put(dir, availableTypes);
 		}
-
-		this.types = availableTypes;
+		types.put(ForgeDirection.SOUTH, new FaceType[0]);
 	}
 
 	public UIOptionsScreen setDirectionX(ForgeDirection dir, int x) {
 		directionXMap.put(dir, x);
+		return this;
+	}
+
+	public UIOptionsScreen setFaceTypes(ForgeDirection dir, FaceType[] types) {
+		this.types.put(dir, types);
 		return this;
 	}
 
@@ -60,14 +65,17 @@ public class UIOptionsScreen extends UIScreen {
 			@Override
 			public void run() {
 				FaceType currentType = entity.faces.get(translateDirection(dir));
-				for (int i = 0; i < types.length; i++) {
-					if (types[i] == currentType) {
-						if (i + 1 == types.length) {
-							i = -1;
+				FaceType[] types = UIOptionsScreen.this.types.get(dir);
+				if (types != null && types.length > 0) {
+					for (int i = 0; i < types.length; i++) {
+						if (types[i] == currentType) {
+							if (i + 1 == types.length) {
+								i = -1;
+							}
+							entity.faces.put(translateDirection(dir), types[i + 1]);
+							ModPacket.sendTileEntityUpdateToServer(entity);
+							return;
 						}
-						entity.faces.put(translateDirection(dir), types[i + 1]);
-						ModPacket.sendTileEntityUpdateToServer(entity);
-						return;
 					}
 				}
 			}
@@ -125,11 +133,16 @@ public class UIOptionsScreen extends UIScreen {
 
 	private int getY(ForgeDirection dir) {
 		FaceType type = entity.faces.get(dir);
-		for (int i = 0; i < types.length; i++) {
-			if (types[i] == type) {
-				return 23 + (16 * i);
+		FaceType[] types = this.types.get(type);
+		if (types == null || types.length == 0) {
+			return 23;
+		} else {
+			for (int i = 0; i < types.length; i++) {
+				if (types[i] == type) {
+					return 23 + (16 * i);
+				}
 			}
+			return -1;
 		}
-		return -1;
 	}
 }

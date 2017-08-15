@@ -10,7 +10,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
-public class DustSteel extends KekCraftItem {
+public class DustSteel extends CraftSharpItem {
 	public DustSteel() {
 		super("DustSteel");
 		DictionaryHandler.register("dustSteel", this);

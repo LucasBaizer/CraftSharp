@@ -4,7 +4,7 @@ import com.craftsharp.api.ui.MachineUpgrade;
 
 import net.minecraft.init.Items;
 
-public class ItemUpgradeFluid extends KekCraftItemUpgrade {
+public class ItemUpgradeFluid extends CraftSharpItemUpgrade {
 	public ItemUpgradeFluid() {
 		super("UpgradeFluid", Items.water_bucket);
 	}

@@ -4,6 +4,8 @@ import mekanism.api.gas.Gas;
 
 public class GasRefrigerant extends Gas {
 	public GasRefrigerant() {
-		super("Refrigerant");
+		super("refrigerant");
+
+		registerFluid();
 	}
 }

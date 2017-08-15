@@ -116,7 +116,9 @@ public abstract class ElectricFluidMachineTileEntity extends ElectricMachineTile
 				if (!currentRecipe.satifies(this, slots)) {
 					reset();
 					onSmeltingStopped();
-					onSmeltingFinished();
+					if (getNextRecipe() == null) {
+						onSmeltingFinished();
+					}
 					if (enablesAutomaticUpdates()) {
 						ModPacket.sendTileEntityUpdate(this);
 					}

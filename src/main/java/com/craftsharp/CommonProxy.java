@@ -8,11 +8,13 @@ import java.util.List;
 
 import com.craftsharp.api.ui.Machine;
 import com.craftsharp.api.ui.UIHandler;
-import com.craftsharp.blocks.KekCraftBlock;
-import com.craftsharp.blocks.KekCraftBlockOre;
+import com.craftsharp.blocks.CraftSharpBlock;
+import com.craftsharp.blocks.CraftSharpBlockOre;
 import com.craftsharp.blocks.OreGenerationHandler;
+import com.craftsharp.blocks.machines.BlockAirCompressor;
 import com.craftsharp.blocks.machines.BlockCircuitFabricator;
 import com.craftsharp.blocks.machines.BlockElectricFurnace;
+import com.craftsharp.blocks.machines.BlockGaseousInfuser;
 import com.craftsharp.blocks.machines.BlockGeneratorCrankEngine;
 import com.craftsharp.blocks.machines.BlockHeatTurbine;
 import com.craftsharp.blocks.machines.BlockHighTemperatureAlloyFurnace;
@@ -20,7 +22,9 @@ import com.craftsharp.blocks.machines.BlockManualCrusher;
 import com.craftsharp.blocks.machines.BlockOxidizer;
 import com.craftsharp.blocks.machines.BlockUncrafter;
 import com.craftsharp.cmd.DoxCommand;
-import com.craftsharp.items.KekCraftItem;
+import com.craftsharp.items.CraftSharpItem;
+import com.craftsharp.support.mekanism.GasCompressedAir;
+import com.craftsharp.support.mekanism.GasRefrigerant;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
@@ -31,6 +35,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
+import mekanism.api.gas.GasRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 
@@ -63,21 +68,21 @@ public class CommonProxy {
 
 		Tabs.initialize(factory);
 		try {
-			instantiate("com.kekcraft.items", "KekCraftItem", "KekCraftItemUpgrade");
-			instantiate("com.kekcraft.blocks", "KekCraftBlockOre", "ParticleFX", "KekCraftBlock",
+			instantiate("com.craftsharp.items", "CraftSharpItem", "CraftSharpItemUpgrade");
+			instantiate("com.craftsharp.blocks", "CraftSharpBlockOre", "ParticleFX", "CraftSharpBlock",
 					"OreGenerationHandler");
-			for (Item item : KekCraftItem.ITEMS) {
+			for (Item item : CraftSharpItem.ITEMS) {
 				GameRegistry.registerItem(item, item.getUnlocalizedName().substring(5));
 			}
-			for (Block block : KekCraftBlock.BLOCKS) {
-				GameRegistry.registerBlock(block, "kekcraft_" + block.getUnlocalizedName().substring(5));
+			for (Block block : CraftSharpBlock.BLOCKS) {
+				GameRegistry.registerBlock(block, "craftsharp_" + block.getUnlocalizedName().substring(5));
 			}
-			for (Block block : KekCraftBlockOre.BLOCKS) {
-				GameRegistry.registerBlock(block, "kekcraft_" + block.getUnlocalizedName().substring(5));
+			for (Block block : CraftSharpBlockOre.BLOCKS) {
+				GameRegistry.registerBlock(block, "craftsharp_" + block.getUnlocalizedName().substring(5));
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			System.err.println("There was an error instantiating KekCraft items/blocks.");
+			System.err.println("There was an error instantiating CraftSharp items/blocks.");
 			FMLCommonHandler.instance().exitJava(1, true);
 		}
 		registerMachine(new BlockElectricFurnace(factory));
@@ -88,6 +93,12 @@ public class CommonProxy {
 		registerMachine(new BlockCircuitFabricator(factory));
 		registerMachine(new BlockHeatTurbine(factory));
 		registerMachine(new BlockUncrafter(factory));
+
+		GasRegistry.register(new GasRefrigerant());
+		registerMachine(new BlockGaseousInfuser(factory));
+		
+		GasRegistry.register(new GasCompressedAir());
+		registerMachine(new BlockAirCompressor(factory));
 
 		DictionaryHandler.initialize(factory);
 		RecipeHandler.initialize(factory);

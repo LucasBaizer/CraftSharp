@@ -11,7 +11,6 @@ import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 
@@ -62,8 +61,8 @@ public class ModPacket {
 					int y = in.readInt();
 					int z = in.readInt();
 
-					MachineTileEntity entity = (MachineTileEntity) getTileEntityByID(x, y, z,
-							Minecraft.getMinecraft().theWorld);
+					MachineTileEntity entity = (MachineTileEntity) Minecraft.getMinecraft().theWorld.getTileEntity(x, y,
+							z);
 
 					// checks to make sure entity was not destroyed between
 					// packet
@@ -71,6 +70,7 @@ public class ModPacket {
 					if (entity != null) {
 						entity.read(in);
 					}
+
 				}
 				in.close();
 			}
@@ -88,7 +88,9 @@ public class ModPacket {
 			int y = in.readInt();
 			int z = in.readInt();
 
-			MachineTileEntity entity = (MachineTileEntity) getTileEntityByID(x, y, z, DimensionManager.getWorld(dim));
+			World world = DimensionManager.getWorld(dim);
+
+			MachineTileEntity entity = (MachineTileEntity) world.getTileEntity(x, y, z);
 
 			// checks to make sure entity was not destroyed between
 			// packet
@@ -96,14 +98,10 @@ public class ModPacket {
 			if (entity != null) {
 				entity.read(in);
 			}
-
+			
 			in.close();
 
 			CraftSharp.channel.sendToAll(new FMLProxyPacket(payload, CraftSharp.networkChannelName));
 		}
-	}
-
-	public static TileEntity getTileEntityByID(int x, int y, int z, World world) {
-		return world.getTileEntity(x, y, z);
 	}
 }

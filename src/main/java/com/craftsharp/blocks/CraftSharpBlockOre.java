@@ -7,17 +7,17 @@ import com.craftsharp.CraftSharp;
 
 import net.minecraft.block.BlockOre;
 
-public class KekCraftBlockOre extends BlockOre {
-	public static final List<KekCraftBlockOre> BLOCKS = new ArrayList<KekCraftBlockOre>();
+public class CraftSharpBlockOre extends BlockOre {
+	public static final List<CraftSharpBlockOre> BLOCKS = new ArrayList<CraftSharpBlockOre>();
 	
 	private int veinSize;
 	private int density;
 	private int maxY;
 	private int minY;
 
-	public KekCraftBlockOre(String name, int veinSize, int density, int minY, int maxY, int miningLevel) {
-		this.setBlockName("kekcraft_" + name);
-		this.setBlockTextureName("kekcraft:" + name);
+	public CraftSharpBlockOre(String name, int veinSize, int density, int minY, int maxY, int miningLevel) {
+		this.setBlockName("craftsharp_" + name);
+		this.setBlockTextureName("craftsharp:" + name);
 		this.setVeinSize(veinSize);
 		this.setDensity(density);
 		this.setMaxY(maxY);

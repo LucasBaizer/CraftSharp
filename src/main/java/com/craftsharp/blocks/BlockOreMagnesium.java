@@ -7,9 +7,9 @@ import com.craftsharp.CraftSharp;
 
 import net.minecraft.item.Item;
 
-public class BlockOreMagnesium extends KekCraftBlockOre {
+public class BlockOreMagnesium extends CraftSharpBlockOre {
 	public BlockOreMagnesium() {
-		super("OreMagnesium", 8, 16, 0, 64, KekCraftBlock.STONE);
+		super("OreMagnesium", 8, 16, 0, 64, CraftSharpBlock.STONE);
 		DictionaryHandler.register("oreMagnesium", this);
 
 		setHardness(1.5f);

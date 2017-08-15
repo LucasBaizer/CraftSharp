@@ -13,7 +13,7 @@ public class OreGenerationHandler implements IWorldGenerator {
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator,
 			IChunkProvider chunkProvider) {
 		if (world.provider.dimensionId == 0) {
-			for (KekCraftBlockOre ore : KekCraftBlockOre.BLOCKS) {
+			for (CraftSharpBlockOre ore : CraftSharpBlockOre.BLOCKS) {
 				this.runGenerator(new WorldGenMinable(ore, ore.getVeinSize()), world, random, chunkX, chunkZ,
 						ore.getDensity(), ore.getMinY(), ore.getMaxY());
 			}

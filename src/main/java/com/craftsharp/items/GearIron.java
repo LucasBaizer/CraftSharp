@@ -9,7 +9,7 @@ import com.craftsharp.RecipeHandler;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
-public class GearIron extends KekCraftItem {
+public class GearIron extends CraftSharpItem {
 	public GearIron() {
 		super("GearIron");
 		DictionaryHandler.register("gearIron", this);

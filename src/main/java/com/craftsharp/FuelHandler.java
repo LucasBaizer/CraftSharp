@@ -1,6 +1,6 @@
 package com.craftsharp;
 
-import com.craftsharp.items.KekCraftItem;
+import com.craftsharp.items.CraftSharpItem;
 
 import cpw.mods.fml.common.IFuelHandler;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -15,8 +15,8 @@ public class FuelHandler implements IFuelHandler {
 	@Override
 	public int getBurnTime(ItemStack fuel) {
 		Item item = fuel.getItem();
-		if (item instanceof KekCraftItem) {
-			KekCraftItem f = (KekCraftItem) item;
+		if (item instanceof CraftSharpItem) {
+			CraftSharpItem f = (CraftSharpItem) item;
 			if (f.isFuel()) {
 				return f.getBurnTime();
 			}

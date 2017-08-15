@@ -8,15 +8,15 @@ import com.craftsharp.Tabs;
 
 import net.minecraft.item.Item;
 
-public class KekCraftItem extends Item {
+public class CraftSharpItem extends Item {
 	public static final List<Item> ITEMS = new ArrayList<Item>();
 	private int burnTime = -1;
 
-	public KekCraftItem(String name) {
+	public CraftSharpItem(String name) {
 		ITEMS.add(this);
 
-		setUnlocalizedName("kekcraft_" + name);
-		setTextureName("kekcraft:" + name);
+		setUnlocalizedName("craftsharp_" + name);
+		setTextureName("craftsharp:" + name);
 		setCreativeTab(Tabs.DEFAULT);
 		CraftSharp.factory.addItem(name, this);
 	}

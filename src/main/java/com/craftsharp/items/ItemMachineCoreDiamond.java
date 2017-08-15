@@ -4,7 +4,7 @@ import com.craftsharp.RecipeHandler;
 
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
-public class ItemMachineCoreDiamond extends KekCraftItem {
+public class ItemMachineCoreDiamond extends CraftSharpItem {
 	public ItemMachineCoreDiamond() {
 		super("MachineCoreDiamond");
 		RecipeHandler.RECIPES
