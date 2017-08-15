@@ -1,0 +1,49 @@
+language.name=English
+language.region=US
+language.code=en_US
+
+itemGroup.KekCraft=KekCraft
+
+tile.kekcraft_OreAluminum.name=Aluminum Ore
+tile.kekcraft_OreMagnesium.name=Magnesium Ore
+tile.kekcraft_BlockSilicon.name=Block of Silicon
+tile.kekcraft_BlockSteel.name=Block of Steel
+tile.kekcraft_BlockAluminum.name=Block of Aluminum
+
+tile.kekcraft_CircuitFabricator.name=Circuit Fabricator
+tile.kekcraft_CrankEngine.name=Crank Engine
+tile.kekcraft_ElectricFurnace.name=Electric Furnace
+tile.kekcraft_HighTemperatureAlloyFurnace.name=High Temperature Alloy Furnace
+tile.kekcraft_ManualCrusher.name=Manual Crusher
+tile.kekcraft_Oxidizer.name=Oxidizer
+tile.kekcraft_HeatTurbine.name=Heat Turbine
+tile.kekcraft_Uncrafter.name=Uncrafter
+
+item.kekcraft_DustAluminum.name=Aluminum Dust
+item.kekcraft_DustIron.name=Iron Dust
+item.kekcraft_DustIronOxide.name=Iron Oxide
+item.kekcraft_DustMagnesium.name=Magnesium Dust
+item.kekcraft_DustSteel.name=Steel Dust
+item.kekcraft_DustThermite.name=Thermite
+item.kekcraft_GearIron.name=Iron Gear
+item.kekcraft_GearSteel.name=Steel Gear
+item.kekcraft_IngotAluminum.name=Aluminum Ingot
+item.kekcraft_IngotSteel.name=Steel Ingot
+item.kekcraft_MachineCore.name=Machine Core
+item.kekcraft_RefinedSilicon.name=Refined Silicon
+item.kekcraft_Silicon.name=Raw Silicon
+item.kekcraft_CircuitRedstone.name=Redstone Circuit
+item.kekcraft_CircuitIron.name=Iron-Engraved Circuit
+item.kekcraft_CircuitGold.name=Gold-Engraved Circuit
+item.kekcraft_CircuitDiamond.name=Diamond-Engraved Circuit
+item.kekcraft_CircuitEmerald.name=Emerald-Engraved Circuit
+item.kekcraft_MachineCoreRedstone.name=Basic Machine Core
+item.kekcraft_MachineCoreIron.name=Strong Machine Core
+item.kekcraft_MachineCoreGold.name=Advanced Machine Core
+item.kekcraft_MachineCoreDiamond.name=Elite Machine Core
+item.kekcraft_MachineCoreEmerald.name=Ultimate Machine Core
+item.kekcraft_UpgradeEnergy.name=Energy Efficiency Upgrade
+item.kekcraft_UpgradeFluid.name=Fluid Efficiency Upgrade
+item.kekcraft_UpgradeSpeed.name=Speed Upgrade
+item.kekcraft_RodSteel.name=Steel Rod
+item.kekcraft_TurbineComponent.name=Turbine Component
