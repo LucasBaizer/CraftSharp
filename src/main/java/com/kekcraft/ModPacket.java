@@ -21,6 +21,11 @@ public class ModPacket {
 			KekCraft.channel.sendToAll(createMachinePacket(machine));
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (Exception e) {
+			System.err.println(
+					"An error occured while serializing a machine-- the update (server-to-clients) will not be sent!");
+			System.err.println("If this happened while a world loaded, then it is likely not an issue.");
+			e.printStackTrace();
 		}
 	}
 
@@ -28,6 +33,11 @@ public class ModPacket {
 		try {
 			KekCraft.channel.sendToServer(createMachinePacket(machine));
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			System.err.println(
+					"An error occured while serializing a machine-- the update (client-to-server) will not be sent!");
+			System.err.println("If this happened while a world loaded, then it is likely not an issue.");
 			e.printStackTrace();
 		}
 	}

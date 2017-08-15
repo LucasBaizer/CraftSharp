@@ -102,7 +102,7 @@ public class BlockOxidizer extends ElectricMachine {
 				public void run() {
 					ui.addScreen(new UIMainScreen(ui) {
 						@Override
-						public void render(MachineTileEntity m, Object... args) {
+						public void render(MachineTileEntity m) {
 							BlockOxidizerTileEntity e = (BlockOxidizerTileEntity) m;
 
 							int barWidth = 7;

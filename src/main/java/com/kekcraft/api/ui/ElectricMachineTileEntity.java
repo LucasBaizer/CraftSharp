@@ -21,7 +21,7 @@ public abstract class ElectricMachineTileEntity extends MachineTileEntity
 		super(slots, update);
 	}
 
-	private int getEnergyCostPerCook(IMachineRecipe recipe) {
+	private int getEnergyCostPerCook(IMachineSmeltableRecipe recipe) {
 		return (recipe.getFuelCost() * (getUpgrades(MachineUpgrade.SPEED) + 1)
 				/ (getUpgrades(MachineUpgrade.ENERGY_EFFICIENCY) + 1))
 				/ (recipe.getCookTime() / (getUpgrades(MachineUpgrade.SPEED) + 1));
@@ -33,7 +33,7 @@ public abstract class ElectricMachineTileEntity extends MachineTileEntity
 
 		if (!this.worldObj.isRemote) {
 			if (canSmelt()) {
-				IMachineRecipe recipe = getNextRecipe();
+				IMachineSmeltableRecipe recipe = (IMachineSmeltableRecipe) getNextRecipe();
 				if (recipe != null) {
 					if (energy.getEnergyStored() - recipe.getFuelCost() >= 0) {
 						beginSmeltNextItem();
@@ -54,11 +54,13 @@ public abstract class ElectricMachineTileEntity extends MachineTileEntity
 				if (!currentRecipe.satifies(this, slots)) {
 					reset();
 					onSmeltingStopped();
-					ModPacket.sendTileEntityUpdate(this);
+					if (enablesAutomaticUpdates()) {
+						ModPacket.sendTileEntityUpdate(this);
+					}
 				} else {
 					currentCookTime--;
 
-					energy.modifyEnergyStored(-getEnergyCostPerCook(currentRecipe));
+					energy.modifyEnergyStored(-getEnergyCostPerCook((IMachineSmeltableRecipe) currentRecipe));
 
 					if (enablesAutomaticUpdates()) {
 						cookTicks++;
@@ -83,7 +85,8 @@ public abstract class ElectricMachineTileEntity extends MachineTileEntity
 		super.readFromNBT(tagCompound);
 
 		energy.setEnergyStored(tagCompound.getInteger("Energy"));
-		energy.setMaxTransfer(tagCompound.getInteger("TransferRate"));
+		energy.setMaxExtract(tagCompound.getInteger("Extract"));
+		energy.setMaxReceive(tagCompound.getInteger("Receive"));
 		energy.setCapacity(tagCompound.getInteger("MaxEnergy"));
 	}
 
@@ -92,7 +95,8 @@ public abstract class ElectricMachineTileEntity extends MachineTileEntity
 		super.defaultWriteToNBT(tagCompound);
 
 		tagCompound.setInteger("Energy", energy.getEnergyStored());
-		tagCompound.setInteger("TransferRate", energy.getMaxExtract());
+		tagCompound.setInteger("Extract", energy.getMaxExtract());
+		tagCompound.setInteger("Receive", energy.getMaxReceive());
 		tagCompound.setInteger("MaxEnergy", energy.getMaxEnergyStored());
 	}
 
@@ -108,12 +112,12 @@ public abstract class ElectricMachineTileEntity extends MachineTileEntity
 
 	@Override
 	public int getInfoEnergyPerTick() {
-		return isBurningRecipe() ? getEnergyCostPerCook(currentRecipe) : 0;
+		return isBurningRecipe() ? getEnergyCostPerCook((IMachineSmeltableRecipe) currentRecipe) : 0;
 	}
 
 	@Override
 	public int getInfoMaxEnergyPerTick() {
-		return getEnergyCostPerCook(validRecipes.get(0));
+		return getEnergyCostPerCook((IMachineSmeltableRecipe) validRecipes.get(0));
 	}
 
 	@Override
@@ -135,18 +139,24 @@ public abstract class ElectricMachineTileEntity extends MachineTileEntity
 	public void read(ByteBufInputStream in) throws IOException {
 		super.read(in);
 
+		energy.setCapacity(in.readInt());
 		energy.setEnergyStored(in.readInt());
+		energy.setMaxExtract(in.readInt());
+		energy.setMaxReceive(in.readInt());
 	}
 
 	@Override
 	public void write(ByteBufOutputStream out) throws IOException {
 		super.write(out);
 
+		out.writeInt(energy.getMaxEnergyStored());
 		out.writeInt(energy.getEnergyStored());
+		out.writeInt(energy.getMaxExtract());
+		out.writeInt(energy.getMaxReceive());
 	}
 
 	@Override
-	public final boolean canConnectEnergy(ForgeDirection from) {
+	public boolean canConnectEnergy(ForgeDirection from) {
 		return faces.get(from) == FaceType.ENERGY;
 	}
 }

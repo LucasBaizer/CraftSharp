@@ -101,7 +101,7 @@ public class BlockHighTemperatureAlloyFurnace extends FuelMachine {
 				public void run() {
 					ui.addScreen(new UIMainScreen(ui) {
 						@Override
-						public void render(MachineTileEntity m, Object... args) {
+						public void render(MachineTileEntity m) {
 							int flameWidth = 13;
 							int flameHeight = 13;
 							int arrowWidth = 41;
@@ -129,7 +129,7 @@ public class BlockHighTemperatureAlloyFurnace extends FuelMachine {
 								drawTooltip(ui.left + 80, ui.top + 57, arrowWidth, arrowHeight, "0%");
 							}
 						}
-					}.addScreenSwitch(22, 0, 23, 23, "Options"));
+					});
 					ui.addScreen(new UIOptionsScreen(ui, FaceType.NONE, FaceType.ITEM));
 					ui.addScreen(new UIUpgradesScreen(ui));
 					ui.setCurrentUIScreen("MainScreen");

@@ -47,7 +47,7 @@ public abstract class ElectricFluidMachineTileEntity extends ElectricMachineTile
 		return null;
 	}
 
-	private int getEnergyCostPerCook(IMachineRecipe recipe) {
+	private int getEnergyCostPerCook(IMachineSmeltableRecipe recipe) {
 		return (recipe.getFuelCost() * (getUpgrades(MachineUpgrade.SPEED) + 1)
 				/ (getUpgrades(MachineUpgrade.ENERGY_EFFICIENCY) + 1))
 				/ (recipe.getCookTime() / (getUpgrades(MachineUpgrade.SPEED) + 1));
@@ -123,7 +123,7 @@ public abstract class ElectricFluidMachineTileEntity extends ElectricMachineTile
 				} else {
 					currentCookTime--;
 
-					energy.modifyEnergyStored(-getEnergyCostPerCook(currentRecipe));
+					energy.modifyEnergyStored(-getEnergyCostPerCook((IFluidMachineRecipe) currentRecipe));
 					fluid.drain(getFluidCostPerCook((IFluidMachineRecipe) currentRecipe), true);
 
 					if (enablesAutomaticUpdates()) {

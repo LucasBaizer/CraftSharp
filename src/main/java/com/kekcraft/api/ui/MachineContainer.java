@@ -40,14 +40,14 @@ public class MachineContainer extends Container {
 	public Slot createOutputSlot(int index, int x, int y) {
 		return new SlotFurnace(inventory.player, tileEntity, index, x, normalize(y));
 	}
-
+	
 	public Slot createUpgradeSlot(int index, int x, int y) {
 		if (firstUpgradeIndex == -1) {
 			firstUpgradeIndex = index;
 		}
 		return new UpgradeSlot(index, x, normalize(y), index - firstUpgradeIndex);
 	}
-
+	
 	public class UpgradeSlot extends Slot {
 		private int offset;
 

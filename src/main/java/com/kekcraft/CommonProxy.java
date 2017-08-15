@@ -1,8 +1,6 @@
 package com.kekcraft;
 
-import static com.kekcraft.KekCraft.channel;
-import static com.kekcraft.KekCraft.factory;
-import static com.kekcraft.KekCraft.networkChannelName;
+import static com.kekcraft.KekCraft.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -18,6 +16,7 @@ import com.kekcraft.blocks.OreGenerationHandler;
 import com.kekcraft.blocks.machines.BlockCircuitFabricator;
 import com.kekcraft.blocks.machines.BlockElectricFurnace;
 import com.kekcraft.blocks.machines.BlockGeneratorCrankEngine;
+import com.kekcraft.blocks.machines.BlockHeatTurbine;
 import com.kekcraft.blocks.machines.BlockHighTemperatureAlloyFurnace;
 import com.kekcraft.blocks.machines.BlockManualCrusher;
 import com.kekcraft.blocks.machines.BlockOxidizer;
@@ -86,6 +85,7 @@ public class CommonProxy {
 		registerMachine(new BlockManualCrusher(factory));
 		registerMachine(new BlockHighTemperatureAlloyFurnace(factory));
 		registerMachine(new BlockCircuitFabricator(factory));
+		registerMachine(new BlockHeatTurbine(factory));
 
 		DictionaryHandler.initialize(factory);
 		RecipeHandler.initialize(factory);

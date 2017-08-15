@@ -14,6 +14,7 @@ import com.kekcraft.ModPacket;
 import com.kekcraft.SerializableEntity;
 
 import cofh.api.transport.IItemDuct;
+import cpw.mods.fml.common.FMLLog;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 import net.minecraft.client.Minecraft;
@@ -278,7 +279,7 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 	}
 
 	public boolean beginSmeltNextItem() {
-		IMachineRecipe recipe = getNextRecipe();
+		IMachineSmeltableRecipe recipe = (IMachineSmeltableRecipe) getNextRecipe();
 
 		int slot = getAvailableOutputSlot(recipe.getOutput());
 		if (slot != -1) {
@@ -297,24 +298,28 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 	}
 
 	public void smeltNextItem() {
-		try {
-			if (this.slots[targetSlot] == null) {
-				this.slots[targetSlot] = currentRecipe.getOutput().copy();
-			} else {
-				this.slots[targetSlot].stackSize += currentRecipe.getOutput().stackSize;
-			}
-
-			for (int slot : currentRecipe.getRecipeSlots()) {
-				slots[slot].stackSize -= currentRecipe.getInput(slot).stackSize;
-				if (slots[slot].stackSize <= 0) {
-					slots[slot] = null;
-					onInputSlotExhausted(slot);
+		if (currentRecipe instanceof IMachineSmeltableRecipe) {
+			try {
+				if (this.slots[targetSlot] == null) {
+					this.slots[targetSlot] = ((IMachineSmeltableRecipe) currentRecipe).getOutput().copy();
+				} else {
+					this.slots[targetSlot].stackSize += ((IMachineSmeltableRecipe) currentRecipe).getOutput().stackSize;
 				}
+
+				for (int slot : currentRecipe.getRecipeSlots()) {
+					slots[slot].stackSize -= currentRecipe.getInput(slot).stackSize;
+					if (slots[slot].stackSize <= 0) {
+						slots[slot] = null;
+						onInputSlotExhausted(slot);
+					}
+				}
+			} catch (NullPointerException e) {
+				e.printStackTrace();
+				System.err.println("NullPointerException thrown when finishing smelt!");
+				return;
 			}
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-			System.err.println("NullPointerException thrown when finishing smelt!");
-			return;
+		} else {
+			FMLLog.warning("smeltNextItem was called, but the current recipe is not smeltable.");
 		}
 	}
 

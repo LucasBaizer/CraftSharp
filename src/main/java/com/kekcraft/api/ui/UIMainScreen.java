@@ -4,7 +4,7 @@ import com.kekcraft.api.ui.MachineContainer.UpgradeSlot;
 
 import net.minecraft.inventory.Slot;
 
-public abstract class UIMainScreen extends UIScreen {
+public class UIMainScreen extends UIScreen {
 	public UIMainScreen(MachineUI ui) {
 		super(ui, "MainScreen");
 

@@ -6,17 +6,16 @@ import static net.minecraft.init.Items.*;
 import java.awt.Dimension;
 
 import com.kekcraft.KekCraft;
-import com.kekcraft.ModPacket;
 import com.kekcraft.RecipeHandler;
 import com.kekcraft.Tabs;
 import com.kekcraft.api.GameFactory;
-import com.kekcraft.api.ui.ElectricMachineTileEntity;
+import com.kekcraft.api.ui.FaceType;
 import com.kekcraft.api.ui.Generator;
 import com.kekcraft.api.ui.GeneratorTileEntity;
 import com.kekcraft.api.ui.MachineContainer;
 import com.kekcraft.api.ui.MachineTileEntity;
 import com.kekcraft.api.ui.UIMainScreen;
-import com.kekcraft.api.ui.UIScreen;
+import com.kekcraft.api.ui.UIOptionsScreen;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.material.Material;
@@ -26,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class BlockGeneratorCrankEngine extends Generator {
@@ -33,10 +33,10 @@ public class BlockGeneratorCrankEngine extends Generator {
 	private IIcon sideIcon;
 
 	public BlockGeneratorCrankEngine(GameFactory factory) {
-		super(Material.glass, KekCraft.modInstance, 1, "CrankEngine");
+		super(Material.rock, KekCraft.modInstance, 1, "CrankEngine");
 
 		factory.initializeBlock(this, "Crank Engine", "CrankEngine", Tabs.DEFAULT, "CrankEngine");
-		setWindowDimensions(new Dimension(-1, 88));
+		setWindowDimensions(new Dimension(-1, 111));
 
 		RecipeHandler.FUTURES.add(new Runnable() {
 			@Override
@@ -67,7 +67,6 @@ public class BlockGeneratorCrankEngine extends Generator {
 			BlockGeneratorCrankEngineTileEntity tile = (BlockGeneratorCrankEngineTileEntity) world.getTileEntity(x, y,
 					z);
 			tile.energy.modifyEnergyStored(25);
-			ModPacket.sendTileEntityUpdate(tile);
 		}
 		return true;
 	}
@@ -79,11 +78,12 @@ public class BlockGeneratorCrankEngine extends Generator {
 
 	@Override
 	public void drawTiles(MachineContainer container) {
+		container.setNormalizer(12);
 	}
 
 	public static class BlockGeneratorCrankEngineTileEntity extends GeneratorTileEntity {
 		public BlockGeneratorCrankEngineTileEntity() {
-			super(0);
+			super(0, -1);
 
 			setItemSlots(new int[0]);
 			setOutputSlots(new int[0]);
@@ -97,25 +97,21 @@ public class BlockGeneratorCrankEngine extends Generator {
 				public void run() {
 					ui.addScreen(new UIMainScreen(ui) {
 						@Override
-						public void render(MachineTileEntity m, Object... args) {
-							ElectricMachineTileEntity e = (ElectricMachineTileEntity) m;
+						public void render(MachineTileEntity m) {
+							BlockGeneratorCrankEngineTileEntity e = (BlockGeneratorCrankEngineTileEntity) m;
 
 							int barWidth = 7;
 							int barHeight = 74;
-							int targetHeight = (barHeight
-									- ((int) e.energy.getMaxEnergyStored() - (int) e.energy.getEnergyStored())
-											* barHeight / (int) e.energy.getMaxEnergyStored());
-							drawUV(ui.left + 85, ui.top + 6 + (barHeight - targetHeight), 176, barHeight - targetHeight,
-									barWidth, targetHeight);
-							drawTooltip(ui.left + 85, ui.top + 6, barWidth, barHeight,
+							int targetHeight = (barHeight - (e.energy.getMaxEnergyStored() - e.energy.getEnergyStored())
+									* barHeight / (int) e.energy.getMaxEnergyStored());
+							drawUV(ui.left + 85, ui.top + 29 + (barHeight - targetHeight), 176,
+									23 + barHeight - targetHeight, barWidth, targetHeight);
+							drawTooltip(ui.left + 85, ui.top + 29, barWidth, barHeight,
 									e.energy.getEnergyStored() + " RF");
 						}
-					}.addScreenSwitch(22, 0, 23, 23, "Options"));
-					ui.addScreen(new UIScreen(ui, "Options") {
-						@Override
-						public void render(MachineTileEntity e, Object... args) {
-						}
-					}.addScreenSwitch(0, 0, 23, 23, "MainScreen"));
+					});
+					ui.addScreen(new UIOptionsScreen(ui, FaceType.NONE, FaceType.ENERGY)
+							.setDirectionX(ForgeDirection.UP, 192));
 					ui.setCurrentUIScreen("MainScreen");
 				}
 			};

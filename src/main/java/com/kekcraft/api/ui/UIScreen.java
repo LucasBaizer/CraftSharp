@@ -43,7 +43,9 @@ public abstract class UIScreen {
 		return name;
 	}
 
-	public abstract void render(MachineTileEntity e, Object... args);
+	public void render(MachineTileEntity e) {
+		
+	}
 	
 	public void load(MachineUI e) {}
 

@@ -11,7 +11,10 @@ import com.kekcraft.api.GameFactory;
 import com.kekcraft.api.ui.DefaultMachineRecipe;
 import com.kekcraft.api.ui.ElectricMachine;
 import com.kekcraft.api.ui.ElectricMachineTileEntity;
+import com.kekcraft.api.ui.FaceType;
 import com.kekcraft.api.ui.MachineContainer;
+import com.kekcraft.api.ui.UIMainScreen;
+import com.kekcraft.api.ui.UIOptionsScreen;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.material.Material;
@@ -22,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class BlockManualCrusher extends ElectricMachine {
@@ -99,6 +103,21 @@ public class BlockManualCrusher extends ElectricMachine {
 					new ItemStack(KekCraft.factory.getItem("DustAluminum")), -1, 100, 0));
 			addRecipe(new DefaultMachineRecipe(new ItemStack(KekCraft.factory.getItem("IngotSteel")),
 					new ItemStack(KekCraft.factory.getItem("DustSteel")), -1, 100, 0));
+
+			onUISet = new Runnable() {
+				@Override
+				public void run() {
+					ui.addScreen(new UIMainScreen(ui));
+					ui.addScreen(new UIOptionsScreen(ui, FaceType.NONE, FaceType.ITEM)
+							.setDirectionX(ForgeDirection.UP, 192));
+					ui.setCurrentUIScreen("MainScreen");
+				}
+			};
+		}
+
+		@Override
+		public boolean canConnectEnergy(ForgeDirection from) {
+			return false;
 		}
 
 		@Override

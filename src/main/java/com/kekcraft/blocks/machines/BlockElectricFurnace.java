@@ -42,7 +42,7 @@ public class BlockElectricFurnace extends ElectricMachine {
 						'A', iron_ingot, 'B', stone, 'C', KekCraft.factory.getItem("MachineCore"));
 			}
 		});
-
+		
 		initializeSpecialIcons();
 		setParticleColor(ParticleColor.BLACK);
 	}
@@ -89,7 +89,7 @@ public class BlockElectricFurnace extends ElectricMachine {
 				public void run() {
 					ui.addScreen(new UIMainScreen(ui) {
 						@Override
-						public void render(MachineTileEntity m, Object... args) {
+						public void render(MachineTileEntity m) {
 							BlockElectricFurnaceTileEntity e = (BlockElectricFurnaceTileEntity) m;
 
 							int barWidth = 7;

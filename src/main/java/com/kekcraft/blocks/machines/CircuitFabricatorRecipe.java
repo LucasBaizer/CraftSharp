@@ -4,14 +4,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.kekcraft.KekCraft;
-import com.kekcraft.api.ui.IMachineRecipe;
+import com.kekcraft.api.ui.IMachineSmeltableRecipe;
 import com.kekcraft.api.ui.MachineTileEntity;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class CircuitFabricatorRecipe implements IMachineRecipe {
+public class CircuitFabricatorRecipe implements IMachineSmeltableRecipe {
 	private static final long serialVersionUID = 428852275461702654L;
 
 	private transient ItemStack inputA;

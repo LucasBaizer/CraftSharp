@@ -97,7 +97,7 @@ public class BlockCircuitFabricator extends ElectricMachine {
 				public void run() {
 					ui.addScreen(new UIMainScreen(ui) {
 						@Override
-						public void render(MachineTileEntity m, Object... args) {
+						public void render(MachineTileEntity m) {
 							BlockCircuitFabricatorTileEntity e = (BlockCircuitFabricatorTileEntity) m;
 
 							int barWidth = 7;

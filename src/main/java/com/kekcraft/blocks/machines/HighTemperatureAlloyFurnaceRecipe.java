@@ -4,13 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.kekcraft.KekCraft;
-import com.kekcraft.api.ui.IMachineRecipe;
+import com.kekcraft.api.ui.IMachineSmeltableRecipe;
 import com.kekcraft.api.ui.MachineTileEntity;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class HighTemperatureAlloyFurnaceRecipe implements IMachineRecipe {
+public class HighTemperatureAlloyFurnaceRecipe implements IMachineSmeltableRecipe {
 	private static final long serialVersionUID = -8206894167646765940L;
 
 	private transient ItemStack a;

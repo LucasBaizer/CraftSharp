@@ -15,13 +15,9 @@ public interface IMachineRecipe extends Serializable {
 
 	public ItemStack getInput(int slot);
 
-	public ItemStack getOutput();
-
 	public List<Integer> getRecipeSlots();
 
 	public int getCookTime();
-	
-	public int getFuelCost();
 	
 	public void writeToNBT(NBTTagCompound nbt);
 	

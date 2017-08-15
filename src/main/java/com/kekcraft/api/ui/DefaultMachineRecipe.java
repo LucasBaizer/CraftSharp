@@ -6,7 +6,7 @@ import java.util.List;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class DefaultMachineRecipe implements IMachineRecipe {
+public class DefaultMachineRecipe implements IMachineSmeltableRecipe {
 	private static final long serialVersionUID = -9178875502583203568L;
 
 	private transient ItemStack in;

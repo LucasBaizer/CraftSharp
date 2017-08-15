@@ -2,12 +2,15 @@ package com.kekcraft.api.ui;
 
 import static net.minecraftforge.common.util.ForgeDirection.*;
 
+import java.util.HashMap;
+
 import com.kekcraft.ModPacket;
 import com.kekcraft.api.ui.MachineContainer.InventorySlot;
 
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class UIOptionsScreen extends UIScreen {
+	private HashMap<ForgeDirection, Integer> directionXMap = new HashMap<ForgeDirection, Integer>();
 	private MachineTileEntity entity;
 	private FaceType[] types;
 
@@ -22,7 +25,16 @@ public class UIOptionsScreen extends UIScreen {
 		addClickListener(99, 55, 16, 16, createRunnable(EAST));
 		addClickListener(61, 74, 16, 16, createRunnable(NORTH));
 
+		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+			directionXMap.put(dir, 176);
+		}
+
 		this.types = availableTypes;
+	}
+
+	public UIOptionsScreen setDirectionX(ForgeDirection dir, int x) {
+		directionXMap.put(dir, x);
+		return this;
 	}
 
 	@Override
@@ -33,14 +45,14 @@ public class UIOptionsScreen extends UIScreen {
 	}
 
 	@Override
-	public void render(MachineTileEntity e, Object... args) {
+	public void render(MachineTileEntity e) {
 		this.entity = e;
 
-		drawUV(ui.left + 80, ui.top + 36, 176, getY(translateDirection(UP)), 16, 16);
-		drawUV(ui.left + 80, ui.top + 74, 176, getY(translateDirection(DOWN)), 16, 16);
-		drawUV(ui.left + 61, ui.top + 55, 176, getY(translateDirection(WEST)), 16, 16);
-		drawUV(ui.left + 99, ui.top + 55, 176, getY(translateDirection(EAST)), 16, 16);
-		drawUV(ui.left + 61, ui.top + 74, 176, getY(translateDirection(NORTH)), 16, 16);
+		drawUV(ui.left + 80, ui.top + 36, directionXMap.get(UP), getY(translateDirection(UP)), 16, 16);
+		drawUV(ui.left + 80, ui.top + 74, directionXMap.get(DOWN), getY(translateDirection(DOWN)), 16, 16);
+		drawUV(ui.left + 61, ui.top + 55, directionXMap.get(WEST), getY(translateDirection(WEST)), 16, 16);
+		drawUV(ui.left + 99, ui.top + 55, directionXMap.get(EAST), getY(translateDirection(EAST)), 16, 16);
+		drawUV(ui.left + 61, ui.top + 74, directionXMap.get(NORTH), getY(translateDirection(NORTH)), 16, 16);
 	}
 
 	private Runnable createRunnable(final ForgeDirection dir) {

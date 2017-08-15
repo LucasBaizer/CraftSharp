@@ -20,6 +20,6 @@ public class UIUpgradesScreen extends UIScreen {
 	}
 
 	@Override
-	public void render(MachineTileEntity e, Object... args) {
+	public void render(MachineTileEntity e) {
 	}
 }
