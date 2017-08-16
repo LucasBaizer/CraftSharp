@@ -20,11 +20,19 @@ import com.craftsharp.blocks.machines.BlockHeatTurbine;
 import com.craftsharp.blocks.machines.BlockHighTemperatureAlloyFurnace;
 import com.craftsharp.blocks.machines.BlockManualCrusher;
 import com.craftsharp.blocks.machines.BlockOxidizer;
+import com.craftsharp.blocks.machines.BlockRefrigerantCompressor;
 import com.craftsharp.blocks.machines.BlockUncrafter;
 import com.craftsharp.cmd.DoxCommand;
 import com.craftsharp.items.CraftSharpItem;
+import com.craftsharp.support.mekanism.BlockLiquidAir;
+import com.craftsharp.support.mekanism.BlockLiquidNitrogen;
+import com.craftsharp.support.mekanism.BucketLiquidAir;
+import com.craftsharp.support.mekanism.BucketLiquidNitrogen;
 import com.craftsharp.support.mekanism.GasCompressedAir;
+import com.craftsharp.support.mekanism.GasNitrogen;
 import com.craftsharp.support.mekanism.GasRefrigerant;
+import com.craftsharp.support.mekanism.LiquidAir;
+import com.craftsharp.support.mekanism.LiquidNitrogen;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
@@ -37,7 +45,13 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import mekanism.api.gas.GasRegistry;
 import net.minecraft.block.Block;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBucket;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidRegistry;
 
 public class CommonProxy {
 	private static void instantiate(String pkg, String... ignore) throws ReflectiveOperationException, IOException {
@@ -85,6 +99,26 @@ public class CommonProxy {
 			System.err.println("There was an error instantiating CraftSharp items/blocks.");
 			FMLCommonHandler.instance().exitJava(1, true);
 		}
+
+		Fluid fluidAir = new LiquidAir();
+		Fluid fluidNitrogen = new LiquidNitrogen();
+		FluidRegistry.registerFluid(fluidAir);
+		FluidRegistry.registerFluid(fluidNitrogen);
+
+		Block fluidBlock = new BlockLiquidAir();
+		Block nitrogenBlock = new BlockLiquidNitrogen();
+		GameRegistry.registerBlock(fluidBlock, MODID + "_" + fluidBlock.getUnlocalizedName().substring(5));
+		GameRegistry.registerBlock(nitrogenBlock, MODID + "_" + nitrogenBlock.getUnlocalizedName().substring(5));
+
+		ItemBucket bucket = new BucketLiquidAir(factory);
+		ItemBucket nitroBucket = new BucketLiquidNitrogen(factory);
+		GameRegistry.registerItem(bucket, MODID + "_" + bucket.getUnlocalizedName().substring(5));
+		GameRegistry.registerItem(nitroBucket, MODID + "_" + nitroBucket.getUnlocalizedName().substring(5));
+
+		FluidContainerRegistry.registerFluidContainer(fluidAir, new ItemStack(bucket), new ItemStack(Items.bucket));
+		FluidContainerRegistry.registerFluidContainer(fluidNitrogen, new ItemStack(nitroBucket),
+				new ItemStack(Items.bucket));
+
 		registerMachine(new BlockElectricFurnace(factory));
 		registerMachine(new BlockGeneratorCrankEngine(factory));
 		registerMachine(new BlockOxidizer(factory));
@@ -95,10 +129,12 @@ public class CommonProxy {
 		registerMachine(new BlockUncrafter(factory));
 
 		GasRegistry.register(new GasRefrigerant());
-		registerMachine(new BlockGaseousInfuser(factory));
-		
 		GasRegistry.register(new GasCompressedAir());
+		GasRegistry.register(new GasNitrogen());
+
+		registerMachine(new BlockGaseousInfuser(factory));
 		registerMachine(new BlockAirCompressor(factory));
+		registerMachine(new BlockRefrigerantCompressor(factory));
 
 		DictionaryHandler.initialize(factory);
 		RecipeHandler.initialize(factory);

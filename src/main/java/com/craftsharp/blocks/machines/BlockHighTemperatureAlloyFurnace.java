@@ -23,6 +23,7 @@ import com.craftsharp.api.ui.UIUpgradesScreen;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -92,6 +93,15 @@ public class BlockHighTemperatureAlloyFurnace extends FuelMachine {
 			addRecipe(new HighTemperatureAlloyFurnaceRecipe(new ItemStack(CraftSharp.factory.getItem("Silicon")),
 					new ItemStack(CraftSharp.factory.getItem("Silicon")),
 					new ItemStack(CraftSharp.factory.getItem("RefinedSilicon"), 2)));
+			addRecipe(new HighTemperatureAlloyFurnaceRecipe(new ItemStack(CraftSharp.factory.getItem("Thermite"), 8),
+					new ItemStack(Items.coal, 64), new ItemStack(Items.diamond)) {
+				private static final long serialVersionUID = -4148558903737591963L;
+
+				@Override
+				public int getCookTime() {
+					return 800;
+				}
+			});
 
 			setChangeMeta(true);
 			setValidUpgrades(new MachineUpgrade[] { MachineUpgrade.SPEED });

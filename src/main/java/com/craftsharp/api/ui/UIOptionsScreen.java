@@ -11,7 +11,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public class UIOptionsScreen extends UIScreen {
 	private HashMap<ForgeDirection, Integer> directionXMap = new HashMap<ForgeDirection, Integer>();
-	private HashMap<ForgeDirection, FaceType[]> types = new HashMap<ForgeDirection, FaceType[]>();
+	//private HashMap<ForgeDirection, FaceType[]> types = new HashMap<ForgeDirection, FaceType[]>();
+	private FaceType[] types;
 	private MachineTileEntity entity;
 
 	public UIOptionsScreen(MachineUI ui, FaceType... availableTypes) {
@@ -27,9 +28,10 @@ public class UIOptionsScreen extends UIScreen {
 
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 			directionXMap.put(dir, 176);
-			types.put(dir, availableTypes);
+			//types.put(dir, availableTypes);
 		}
-		types.put(ForgeDirection.SOUTH, new FaceType[0]);
+		//types.put(ForgeDirection.SOUTH, new FaceType[0]);
+		this.types = availableTypes;
 	}
 
 	public UIOptionsScreen setDirectionX(ForgeDirection dir, int x) {
@@ -37,10 +39,10 @@ public class UIOptionsScreen extends UIScreen {
 		return this;
 	}
 
-	public UIOptionsScreen setFaceTypes(ForgeDirection dir, FaceType[] types) {
-		this.types.put(dir, types);
-		return this;
-	}
+	//public UIOptionsScreen setFaceTypes(ForgeDirection dir, FaceType[] types) {
+	//	this.types.put(dir, types);
+	//	return this;
+	//}
 
 	@Override
 	public void load(MachineUI e) {
@@ -65,7 +67,7 @@ public class UIOptionsScreen extends UIScreen {
 			@Override
 			public void run() {
 				FaceType currentType = entity.faces.get(translateDirection(dir));
-				FaceType[] types = UIOptionsScreen.this.types.get(dir);
+				//FaceType[] types = UIOptionsScreen.this.types.get(dir);
 				if (types != null && types.length > 0) {
 					for (int i = 0; i < types.length; i++) {
 						if (types[i] == currentType) {
@@ -133,7 +135,7 @@ public class UIOptionsScreen extends UIScreen {
 
 	private int getY(ForgeDirection dir) {
 		FaceType type = entity.faces.get(dir);
-		FaceType[] types = this.types.get(type);
+		//FaceType[] types = this.types.get(type);
 		if (types == null || types.length == 0) {
 			return 23;
 		} else {

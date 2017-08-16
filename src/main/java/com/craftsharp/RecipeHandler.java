@@ -1,16 +1,20 @@
 package com.craftsharp;
 
-import static net.minecraft.init.Items.iron_ingot;
+import static net.minecraft.init.Items.*;
 
 import java.util.ArrayList;
 
 import com.craftsharp.api.GameFactory;
 
 import cpw.mods.fml.common.registry.GameRegistry;
+import mekanism.api.gas.GasRegistry;
+import mekanism.api.gas.GasStack;
+import mekanism.api.recipe.RecipeHelper;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraftforge.fluids.FluidRegistry;
 
 public class RecipeHandler {
 	public static final ArrayList<IRecipe> RECIPES = new ArrayList<IRecipe>();
@@ -35,5 +39,8 @@ public class RecipeHandler {
 		for (Runnable future : FUTURES) {
 			future.run();
 		}
+
+		RecipeHelper.addElectrolyticSeparatorRecipe(FluidRegistry.getFluidStack("liquid_air", 10), 100,
+				new GasStack(GasRegistry.getGas("nitrogen"), 4), new GasStack(GasRegistry.getGas("oxygen"), 1));
 	}
 }

@@ -9,6 +9,8 @@ tile.craftsharp_OreMagnesium.name=Magnesium Ore
 tile.craftsharp_BlockSilicon.name=Block of Silicon
 tile.craftsharp_BlockSteel.name=Block of Steel
 tile.craftsharp_BlockAluminum.name=Block of Aluminum
+tile.LiquidAir.name=Liquid Air
+tile.LiquidNitrogen.name=Liquid Nitrogen
 
 tile.craftsharp_CircuitFabricator.name=Circuit Fabricator
 tile.craftsharp_CrankEngine.name=Crank Engine
@@ -20,6 +22,7 @@ tile.craftsharp_HeatTurbine.name=Heat Turbine
 tile.craftsharp_Uncrafter.name=Uncrafter
 tile.craftsharp_GaseousInfuser.name=Gaseous Infuser
 tile.craftsharp_AirCompressor.name=Air Compressor
+tile.craftsharp_RefrigerantCompressor.name=Refrigerant Compressor
 
 item.craftsharp_DustAluminum.name=Aluminum Dust
 item.craftsharp_DustIron.name=Iron Dust
@@ -50,5 +53,12 @@ item.craftsharp_UpgradeSpeed.name=Speed Upgrade
 item.craftsharp_UpgradeGas.name=Gas Efficiency Upgrade
 item.craftsharp_RodSteel.name=Steel Rod
 item.craftsharp_TurbineComponent.name=Turbine Component
+item.craftsharp_BucketLiquidAir.name=Bucket of Liquid Air
+item.craftsharp_BucketLiquidNitrogen.name=Bucket of Liquid Nitrogen
 
 gas.refrigerant=Chlorodifluoromethane Refrigerant
+gas.compressedAir=Compressed Air
+gas.nitrogen=Nitrogen
+
+fluid.liquid_air=Liquid Air
+fluid.liquid_nitrogen=Liquid Nitrogen

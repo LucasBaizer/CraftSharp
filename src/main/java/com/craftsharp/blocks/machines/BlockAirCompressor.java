@@ -1,6 +1,7 @@
 package com.craftsharp.blocks.machines;
 
 import java.awt.Dimension;
+import java.io.IOException;
 
 import com.craftsharp.CraftSharp;
 import com.craftsharp.ModPacket;
@@ -17,6 +18,8 @@ import com.craftsharp.api.ui.UIMainScreen;
 import com.craftsharp.api.ui.UIOptionsScreen;
 
 import cpw.mods.fml.common.registry.GameRegistry;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.ByteBufOutputStream;
 import mekanism.api.gas.Gas;
 import mekanism.api.gas.GasRegistry;
 import mekanism.api.gas.GasStack;
@@ -27,6 +30,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -44,9 +48,9 @@ public class BlockAirCompressor extends ElectricMachine {
 		RecipeHandler.FUTURES.add(new Runnable() {
 			@Override
 			public void run() {
-				GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(CraftSharp.factory.getBlock("AirCompressor")), "ABA", "CDC", "AAA",
-						'A', Items.iron_ingot, 'B', CraftSharp.factory.getItem("TurbineComponent"), 'C', "circuitIron", 'D',
-						CraftSharp.factory.getItem("MachineCoreIron")));
+				GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(CraftSharp.factory.getBlock("AirCompressor")),
+						"ABA", "CDC", "AAA", 'A', Items.iron_ingot, 'B', CraftSharp.factory.getItem("TurbineComponent"),
+						'C', "circuitIron", 'D', CraftSharp.factory.getItem("MachineCoreIron")));
 			}
 		});
 
@@ -83,7 +87,6 @@ public class BlockAirCompressor extends ElectricMachine {
 		public BlockAirCompressorTileEntity() {
 			super(0, -1);
 
-			setEnableAutomaticUpdates(false);
 			setItemSlots(new int[0]);
 			setOutputSlots(new int[0]);
 
@@ -118,11 +121,11 @@ public class BlockAirCompressor extends ElectricMachine {
 							drawUV(ui.left + 92, ui.top + 29 + (barHeight - airHeight), 183, 23 + barHeight - airHeight,
 									barWidth, airHeight);
 							drawTooltip(ui.left + 92, ui.top + 29, barWidth, barHeight,
-									"Compressed Air: " + air.stored.amount + " RF");
+									"Compressed Air: " + air.stored.amount + " ML");
 						}
 					});
 					ui.addScreen(new UIOptionsScreen(ui, FaceType.NONE, FaceType.ENERGY, FaceType.GAS)
-							.setDirectionX(ForgeDirection.UP, 192).setFaceTypes(ForgeDirection.UP, new FaceType[0]));
+							.setDirectionX(ForgeDirection.UP, 192));
 					ui.setCurrentUIScreen("MainScreen");
 				}
 			};
@@ -131,7 +134,7 @@ public class BlockAirCompressor extends ElectricMachine {
 		@Override
 		public void updateEntity() {
 			if (!this.worldObj.isRemote) {
-				if (air.getNeeded() >= 10) {
+				if (energy.getEnergyStored() >= 100 && air.getNeeded() >= 10) {
 					energy.extractEnergy(100, false);
 					air.receive(new GasStack(air.getGasType(), 10), true);
 
@@ -144,7 +147,13 @@ public class BlockAirCompressor extends ElectricMachine {
 
 		@Override
 		public int receiveGas(ForgeDirection side, GasStack stack, boolean doTransfer) {
-			return faces.get(side) == FaceType.GAS ? air.receive(stack, true) : 0;
+			int received = faces.get(side) == FaceType.GAS ? air.receive(stack, doTransfer) : 0;
+			if (received > 0) {
+				if (enablesAutomaticUpdates()) {
+					ModPacket.sendTileEntityUpdate(this);
+				}
+			}
+			return received;
 		}
 
 		@Override
@@ -154,12 +163,18 @@ public class BlockAirCompressor extends ElectricMachine {
 
 		@Override
 		public GasStack drawGas(ForgeDirection side, int amount, boolean doTransfer) {
-			return faces.get(side) == FaceType.GAS ? air.draw(amount, true) : new GasStack(air.getGasType(), 0);
+			GasStack drawn = faces.get(side) == FaceType.GAS ? air.draw(amount, doTransfer) : null;
+			if (drawn != null && drawn.amount > 0) {
+				if (enablesAutomaticUpdates()) {
+					ModPacket.sendTileEntityUpdate(this);
+				}
+			}
+			return drawn;
 		}
 
 		@Override
 		public GasStack drawGas(ForgeDirection side, int amount) {
-			return drawGas(side, amount);
+			return drawGas(side, amount, true);
 		}
 
 		@Override
@@ -175,6 +190,36 @@ public class BlockAirCompressor extends ElectricMachine {
 		@Override
 		public boolean canTubeConnect(ForgeDirection side) {
 			return faces.get(side) == FaceType.GAS;
+		}
+
+		@Override
+		public void write(ByteBufOutputStream out) throws IOException {
+			super.write(out);
+
+			out.writeInt(air.getStored());
+		}
+
+		@Override
+		public void read(ByteBufInputStream in) throws IOException {
+			super.read(in);
+
+			air.setGas(air.getGas().withAmount(in.readInt()));
+		}
+
+		@Override
+		public void writeToNBT(NBTTagCompound tag) {
+			super.writeToNBT(tag);
+
+			NBTTagCompound air = new NBTTagCompound();
+			this.air.write(air);
+			tag.setTag("Air", air);
+		}
+
+		@Override
+		public void readFromNBT(NBTTagCompound tag) {
+			super.readFromNBT(tag);
+
+			air = GasTank.readFromNBT(tag.getCompoundTag("Air"));
 		}
 	}
 }

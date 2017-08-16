@@ -81,9 +81,9 @@ public class BlockGaseousInfuser extends ElectricMachine {
 
 	public static class BlockGaseousInfuserTileEntity extends ElectricMachineTileEntity
 			implements ITubeConnection, IGasHandler {
-		GasTank hydrogen;
-		GasTank chlorine;
-		GasTank refrigerant;
+		private GasTank hydrogen;
+		private GasTank chlorine;
+		private GasTank refrigerant;
 
 		public BlockGaseousInfuserTileEntity() {
 			super(4, 10);
@@ -196,22 +196,10 @@ public class BlockGaseousInfuser extends ElectricMachine {
 							if (enablesAutomaticUpdates()) {
 								ModPacket.sendTileEntityUpdate(this);
 							}
-
-							// if (recipe.isInstant()) {
-							// energy.modifyEnergyStored(-recipe.getFuelCost());
-							// smeltItemWhenDone();
-							// }
 						}
 					}
 				}
 				if (isBurningRecipe()) {
-					// if (!currentRecipe.satifies(this, slots)) {
-					// reset();
-					// onSmeltingStopped();
-					// if (enablesAutomaticUpdates()) {
-					// ModPacket.sendTileEntityUpdate(this);
-					// }
-					// } else {
 					currentCookTime--;
 
 					int cost = getGasCostPerCook((GaseousInfuserRecipe) currentRecipe);
@@ -233,7 +221,6 @@ public class BlockGaseousInfuser extends ElectricMachine {
 							onSmeltingFinished();
 						}
 					}
-					// }
 				}
 			}
 		}

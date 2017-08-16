@@ -26,7 +26,8 @@ public class GameFactory {
 	public Item getItem(String name) {
 		Item item = (Item) objects.get(name);
 		if (item == null) {
-			System.out.println("WARNING: Attempting to retreive a null item from the GameFactory!");
+			System.out
+					.println("WARNING: Attempting to retreive a null item from the GameFactory: attempt name: " + name);
 			printStackTrace(3);
 		}
 		return item;
