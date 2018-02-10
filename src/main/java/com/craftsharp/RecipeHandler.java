@@ -16,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.fluids.FluidRegistry;
 
+@SuppressWarnings("deprecation")
 public class RecipeHandler {
 	public static final ArrayList<IRecipe> RECIPES = new ArrayList<IRecipe>();
 	public static final ArrayList<Runnable> FUTURES = new ArrayList<Runnable>();

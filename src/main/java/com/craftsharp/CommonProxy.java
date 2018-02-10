@@ -25,13 +25,17 @@ import com.craftsharp.blocks.machines.BlockUncrafter;
 import com.craftsharp.cmd.DoxCommand;
 import com.craftsharp.items.CraftSharpItem;
 import com.craftsharp.support.mekanism.BlockLiquidAir;
+import com.craftsharp.support.mekanism.BlockLiquidHCL;
 import com.craftsharp.support.mekanism.BlockLiquidNitrogen;
 import com.craftsharp.support.mekanism.BucketLiquidAir;
+import com.craftsharp.support.mekanism.BucketLiquidHCL;
 import com.craftsharp.support.mekanism.BucketLiquidNitrogen;
 import com.craftsharp.support.mekanism.GasCompressedAir;
+import com.craftsharp.support.mekanism.GasHCL;
 import com.craftsharp.support.mekanism.GasNitrogen;
 import com.craftsharp.support.mekanism.GasRefrigerant;
 import com.craftsharp.support.mekanism.LiquidAir;
+import com.craftsharp.support.mekanism.LiquidHCL;
 import com.craftsharp.support.mekanism.LiquidNitrogen;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
@@ -102,22 +106,34 @@ public class CommonProxy {
 
 		Fluid fluidAir = new LiquidAir();
 		Fluid fluidNitrogen = new LiquidNitrogen();
+		Fluid fluidHCL = new LiquidHCL();
 		FluidRegistry.registerFluid(fluidAir);
 		FluidRegistry.registerFluid(fluidNitrogen);
+		FluidRegistry.registerFluid(fluidHCL);
 
 		Block fluidBlock = new BlockLiquidAir();
 		Block nitrogenBlock = new BlockLiquidNitrogen();
+		Block hclBlock = new BlockLiquidHCL();
 		GameRegistry.registerBlock(fluidBlock, MODID + "_" + fluidBlock.getUnlocalizedName().substring(5));
 		GameRegistry.registerBlock(nitrogenBlock, MODID + "_" + nitrogenBlock.getUnlocalizedName().substring(5));
+		GameRegistry.registerBlock(hclBlock, MODID + "_" + hclBlock.getUnlocalizedName().substring(5));
 
 		ItemBucket bucket = new BucketLiquidAir(factory);
 		ItemBucket nitroBucket = new BucketLiquidNitrogen(factory);
+		ItemBucket hclBucket = new BucketLiquidHCL(factory);
 		GameRegistry.registerItem(bucket, MODID + "_" + bucket.getUnlocalizedName().substring(5));
 		GameRegistry.registerItem(nitroBucket, MODID + "_" + nitroBucket.getUnlocalizedName().substring(5));
+		GameRegistry.registerItem(hclBucket, MODID + "_" + hclBucket.getUnlocalizedName().substring(5));
 
 		FluidContainerRegistry.registerFluidContainer(fluidAir, new ItemStack(bucket), new ItemStack(Items.bucket));
 		FluidContainerRegistry.registerFluidContainer(fluidNitrogen, new ItemStack(nitroBucket),
 				new ItemStack(Items.bucket));
+		FluidContainerRegistry.registerFluidContainer(fluidHCL, new ItemStack(hclBucket), new ItemStack(Items.bucket));
+
+		GasRegistry.register(new GasRefrigerant());
+		GasRegistry.register(new GasCompressedAir());
+		GasRegistry.register(new GasNitrogen());
+		GasRegistry.register(new GasHCL());
 
 		registerMachine(new BlockElectricFurnace(factory));
 		registerMachine(new BlockGeneratorCrankEngine(factory));
@@ -126,11 +142,9 @@ public class CommonProxy {
 		registerMachine(new BlockHighTemperatureAlloyFurnace(factory));
 		registerMachine(new BlockCircuitFabricator(factory));
 		registerMachine(new BlockHeatTurbine(factory));
-		registerMachine(new BlockUncrafter(factory));
-
-		GasRegistry.register(new GasRefrigerant());
-		GasRegistry.register(new GasCompressedAir());
-		GasRegistry.register(new GasNitrogen());
+		registerMachine(new BlockGaseousInfuser(factory));
+		registerMachine(new BlockAirCompressor(factory));
+		registerMachine(new BlockRefrigerantCompressor(factory));
 
 		registerMachine(new BlockGaseousInfuser(factory));
 		registerMachine(new BlockAirCompressor(factory));
@@ -161,6 +175,17 @@ public class CommonProxy {
 					output, meta, rarity);
 		} catch (ClassNotFoundException ex) {
 			System.out.println("ExNihilo is not present, will not register magnesium dust in sieve.");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		try {
+			Class<?> registry = Class.forName("erogenousbeef.bigreactors.api.registry.BigReactors");
+
+			registry.getDeclaredMethod("registerFluid", String.class, float.class, float.class, float.class,
+					float.class).invoke(null, "liquid_nitrogen", 0.66f, 0.99f, 6.00f, 3f);
+		} catch (ClassNotFoundException ex) {
+			System.out.println("BigReactors is not present, will not register liquid nitrogen as a reactor fluid.");
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
