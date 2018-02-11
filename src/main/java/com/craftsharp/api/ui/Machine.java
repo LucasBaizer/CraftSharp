@@ -60,7 +60,9 @@ public abstract class Machine extends net.minecraft.block.BlockContainer {
 		this.background = background;
 
 		if (UIHandler.uiMap.containsKey(guid)) {
-			throw new ForgeRuntimeException("GUI ID " + guid + " already taken");
+			throw new ForgeRuntimeException(
+					"GUI ID " + guid + " already taken by " + UIHandler.uiMap.get(guid).getClass().getName()
+							+ ", cannot be assigned to " + this.getClass().getName());
 		}
 
 		UIHandler.uiMap.put(guid, this);

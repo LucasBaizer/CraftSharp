@@ -15,7 +15,7 @@ public class UIHandler implements IGuiHandler {
 			if (id == key) {
 				Machine block = uiMap.get(key);
 				MachineTileEntity tileEntity = (MachineTileEntity) world.getTileEntity(x, y, z);
-				return new MachineContainer(player.inventory, block, tileEntity);
+				return new MachineContainer(player.inventory, world, block, tileEntity);
 			}
 		}
 		return null;
@@ -27,7 +27,7 @@ public class UIHandler implements IGuiHandler {
 			if (id == key) {
 				Machine block = uiMap.get(key);
 				MachineTileEntity tileEntity = (MachineTileEntity) world.getTileEntity(x, y, z);
-				return new MachineUI(player.inventory, block, tileEntity);
+				return new MachineUI(player.inventory, world, block, tileEntity);
 			}
 		}
 		return null;

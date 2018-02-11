@@ -3,6 +3,7 @@ package com.craftsharp.blocks.machines;
 import static net.minecraft.init.Items.*;
 
 import java.awt.Dimension;
+import java.util.List;
 
 import com.craftsharp.CraftSharp;
 import com.craftsharp.RecipeHandler;
@@ -20,12 +21,13 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class BlockManualCrusher extends ElectricMachine {
@@ -97,19 +99,53 @@ public class BlockManualCrusher extends ElectricMachine {
 			setItemSlots(new int[] { 0 });
 			setOutputSlots(new int[] { 1 });
 
-			addRecipe(new DefaultMachineRecipe(new ItemStack(Items.iron_ingot),
-					new ItemStack(CraftSharp.factory.getItem("DustIron")), -1, 100, 0));
-			addRecipe(new DefaultMachineRecipe(new ItemStack(CraftSharp.factory.getItem("IngotAluminum")),
-					new ItemStack(CraftSharp.factory.getItem("DustAluminum")), -1, 100, 0));
-			addRecipe(new DefaultMachineRecipe(new ItemStack(CraftSharp.factory.getItem("IngotSteel")),
-					new ItemStack(CraftSharp.factory.getItem("DustSteel")), -1, 100, 0));
+			RecipeHandler.FUTURES.add(new Runnable() {
+				@Override
+				public void run() {
+					for (String name : OreDictionary.getOreNames()) {
+						if (name.startsWith("ingot")) {
+							String factoryName = "Dust" + name.substring(5);
+							if (CraftSharp.factory.hasItem(factoryName)) {
+								Item dust = CraftSharp.factory.getItem(factoryName);
+
+								for (ItemStack ingot : OreDictionary.getOres(name)) {
+									addRecipe(new DefaultMachineRecipe(ingot, new ItemStack(dust), -1, 100, 0));
+								}
+							} else {
+								String dustName = "dust" + name.substring(5);
+								List<ItemStack> items = OreDictionary.getOres(dustName);
+								if (items.size() > 0) {
+									ItemStack dust = items.get(0);
+
+									for (ItemStack ingot : OreDictionary.getOres(name)) {
+										addRecipe(new DefaultMachineRecipe(ingot, dust, -1, 100, 0));
+									}
+								}
+							}
+						}
+					}
+
+					for (ItemStack item : OreDictionary.getOres("ingotIron")) {
+						addRecipe(new DefaultMachineRecipe(item, new ItemStack(CraftSharp.factory.getItem("DustIron")),
+								-1, 100, 0));
+					}
+					for (ItemStack item : OreDictionary.getOres("ingotAluminum")) {
+						addRecipe(new DefaultMachineRecipe(item,
+								new ItemStack(CraftSharp.factory.getItem("DustAluminum")), -1, 100, 0));
+					}
+					for (ItemStack item : OreDictionary.getOres("ingotSteel")) {
+						addRecipe(new DefaultMachineRecipe(item, new ItemStack(CraftSharp.factory.getItem("DustSteel")),
+								-1, 100, 0));
+					}
+				}
+			});
 
 			onUISet = new Runnable() {
 				@Override
 				public void run() {
 					ui.addScreen(new UIMainScreen(ui));
-					ui.addScreen(new UIOptionsScreen(ui, FaceType.NONE, FaceType.ITEM)
-							.setDirectionX(ForgeDirection.UP, 192));
+					ui.addScreen(new UIOptionsScreen(ui, FaceType.NONE, FaceType.ITEM).setDirectionX(ForgeDirection.UP,
+							192));
 					ui.setCurrentUIScreen("MainScreen");
 				}
 			};

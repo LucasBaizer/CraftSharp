@@ -8,6 +8,7 @@ import java.util.HashMap;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.world.World;
 
 public class MachineUI extends GuiContainerModified {
 	public MachineTileEntity tileEntity;
@@ -16,19 +17,21 @@ public class MachineUI extends GuiContainerModified {
 	public int top;
 	public int mouseX;
 	public int mouseY;
+	private World world;
 	private Machine block;
 	private UIScreen currentScreen;
 	private HashMap<String, UIScreen> screens = new HashMap<String, UIScreen>();
 	private ArrayList<ClickListener> clickListeners = new ArrayList<ClickListener>();
 
-	public MachineUI(InventoryPlayer inventory, Machine block, MachineTileEntity tileEntity) {
-		super(new MachineContainer(inventory, block, tileEntity));
+	public MachineUI(InventoryPlayer inventory, World world, Machine block, MachineTileEntity tileEntity) {
+		super(new MachineContainer(inventory, world, block, tileEntity));
 
 		tileEntity.ui = this;
 		if (tileEntity.onUISet != null)
 			tileEntity.onUISet.run();
 
 		this.tileEntity = tileEntity;
+		this.setWorld(world);
 		this.block = block;
 	}
 
@@ -101,6 +104,14 @@ public class MachineUI extends GuiContainerModified {
 
 	public void addClickListener(UIScreen uiScreen, Rectangle rectangle, Runnable r) {
 		clickListeners.add(new ClickListener(uiScreen, rectangle, r));
+	}
+
+	public World getWorld() {
+		return world;
+	}
+
+	public void setWorld(World world) {
+		this.world = world;
 	}
 
 	private static class ClickListener {

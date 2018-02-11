@@ -71,7 +71,8 @@ public class BlockGaseousInfuser extends ElectricMachine {
 				return item.getItem() == Items.diamond;
 			}
 		};
-		slot.setBackgroundIcon(Items.diamond.getIconFromDamage(0));
+		if (container.getWorld().isRemote)
+			slot.setBackgroundIcon(Items.diamond.getIconFromDamage(0));
 		container.addSlotToContainer(slot);
 
 		container.addSlotToContainer(container.createUpgradeSlot(1, 96, 37));

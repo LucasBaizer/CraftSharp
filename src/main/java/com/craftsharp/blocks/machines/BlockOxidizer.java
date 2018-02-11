@@ -27,6 +27,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class BlockOxidizer extends ElectricMachine {
@@ -37,9 +38,9 @@ public class BlockOxidizer extends ElectricMachine {
 		RecipeHandler.FUTURES.add(new Runnable() {
 			@Override
 			public void run() {
-				GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(CraftSharp.factory.getBlock("Oxidizer")), "EAE",
-						"BCB", "DED", 'A', water_bucket, 'B', iron_ingot, 'C', CraftSharp.factory.getItem("MachineCore"),
-						'D', "gearIron", 'E', "ingotAluminum"));
+				GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(CraftSharp.factory.getBlock("Oxidizer")),
+						"EAE", "BCB", "DED", 'A', water_bucket, 'B', iron_ingot, 'C',
+						CraftSharp.factory.getItem("MachineCore"), 'D', "gearIron", 'E', "ingotAluminum"));
 			}
 		});
 
@@ -65,7 +66,8 @@ public class BlockOxidizer extends ElectricMachine {
 				return item.getItem() == Items.water_bucket;
 			}
 		};
-		slot.setBackgroundIcon(Items.water_bucket.getIconFromDamage(0));
+		if (container.getWorld().isRemote)
+			slot.setBackgroundIcon(Items.water_bucket.getIconFromDamage(0));
 		container.addSlotToContainer(slot);
 		container.addSlotToContainer(container.createOutputSlot(2, 141, 58));
 		container.addSlotToContainer(container.createUpgradeSlot(3, 96, 37));
@@ -91,9 +93,17 @@ public class BlockOxidizer extends ElectricMachine {
 			setValidUpgrades(new MachineUpgrade[] { MachineUpgrade.ENERGY_EFFICIENCY, MachineUpgrade.SPEED,
 					MachineUpgrade.FLUID_EFFICIENCY });
 
-			addRecipe(new OxidizerRecipe(new ItemStack(CraftSharp.factory.getItem("DustIron")),
-					new ItemStack(CraftSharp.factory.getItem("DustIronOxide"), 2)));
-			addRecipe(new OxidizerRecipe(new ItemStack(Blocks.cobblestone), new ItemStack(Blocks.mossy_cobblestone)));
+			RecipeHandler.FUTURES.add(new Runnable() {
+				@Override
+				public void run() {
+					for (ItemStack ironDust : OreDictionary.getOres("dustIron")) {
+						addRecipe(new OxidizerRecipe(ironDust,
+								new ItemStack(CraftSharp.factory.getItem("DustIronOxide"), 2)));
+					}
+					addRecipe(new OxidizerRecipe(new ItemStack(Blocks.cobblestone),
+							new ItemStack(Blocks.mossy_cobblestone)));
+				}
+			});
 
 			setChangeMeta(true);
 

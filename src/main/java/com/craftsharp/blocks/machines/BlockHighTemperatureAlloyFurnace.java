@@ -71,7 +71,8 @@ public class BlockHighTemperatureAlloyFurnace extends FuelMachine {
 				return item.getItem() == CraftSharp.factory.getItem("DustThermite");
 			}
 		};
-		slot.setBackgroundIcon(CraftSharp.factory.getItem("DustThermite").getIconFromDamage(0));
+		if (container.getWorld().isRemote)
+			slot.setBackgroundIcon(CraftSharp.factory.getItem("DustThermite").getIconFromDamage(0));
 		container.addSlotToContainer(slot);
 		container.addSlotToContainer(container.createOutputSlot(3, 135, 58));
 		container.addSlotToContainer(container.createUpgradeSlot(4, 96, 58));

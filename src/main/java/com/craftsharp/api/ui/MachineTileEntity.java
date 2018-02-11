@@ -17,7 +17,6 @@ import cofh.api.transport.IItemDuct;
 import cpw.mods.fml.common.FMLLog;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -503,7 +502,7 @@ public abstract class MachineTileEntity extends TileEntity implements ISidedInve
 
 	@Override
 	public void write(ByteBufOutputStream out) throws IOException {
-		out.writeInt(Minecraft.getMinecraft().theWorld.provider.dimensionId);
+		out.writeInt(worldObj.provider.dimensionId);
 		out.writeInt(xCoord);
 		out.writeInt(yCoord);
 		out.writeInt(zCoord);

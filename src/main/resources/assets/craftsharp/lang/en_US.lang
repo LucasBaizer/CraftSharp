@@ -11,6 +11,7 @@ tile.craftsharp_BlockSteel.name=Block of Steel
 tile.craftsharp_BlockAluminum.name=Block of Aluminum
 tile.LiquidAir.name=Liquid Air
 tile.LiquidNitrogen.name=Liquid Nitrogen
+tile.LiquidHCL.name=Hydrochloric Acid
 
 tile.craftsharp_CircuitFabricator.name=Circuit Fabricator
 tile.craftsharp_CrankEngine.name=Crank Engine
@@ -55,10 +56,13 @@ item.craftsharp_RodSteel.name=Steel Rod
 item.craftsharp_TurbineComponent.name=Turbine Component
 item.craftsharp_BucketLiquidAir.name=Bucket of Liquid Air
 item.craftsharp_BucketLiquidNitrogen.name=Bucket of Liquid Nitrogen
+item.craftsharp_BucketLiquidHCL.name=Bucket of Hydrochloric Acid
 
 gas.refrigerant=Chlorodifluoromethane Refrigerant
 gas.compressedAir=Compressed Air
 gas.nitrogen=Nitrogen
+gas.hcl_acid=Hydrochloric Gas
 
 fluid.liquid_air=Liquid Air
 fluid.liquid_nitrogen=Liquid Nitrogen
+fluid.liquid_hcl_acid=Hydrochloric Acid

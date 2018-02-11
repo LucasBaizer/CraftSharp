@@ -82,7 +82,8 @@ public class BlockCircuitFabricator extends ElectricMachine {
 					new ItemStack(CraftSharp.factory.getItem("CircuitRedstone")),
 					CraftSharp.factory.getItem("CircuitIron")));
 			addRecipe(new CircuitFabricatorRecipe(new ItemStack(Items.gold_ingot),
-					new ItemStack(CraftSharp.factory.getItem("CircuitIron")), CraftSharp.factory.getItem("CircuitGold")));
+					new ItemStack(CraftSharp.factory.getItem("CircuitIron")),
+					CraftSharp.factory.getItem("CircuitGold")));
 			addRecipe(new CircuitFabricatorRecipe(new ItemStack(Items.diamond),
 					new ItemStack(CraftSharp.factory.getItem("CircuitGold")),
 					CraftSharp.factory.getItem("CircuitDiamond")));

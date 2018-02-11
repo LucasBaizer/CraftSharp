@@ -38,11 +38,11 @@ public class BlockElectricFurnace extends ElectricMachine {
 		RecipeHandler.FUTURES.add(new Runnable() {
 			@Override
 			public void run() {
-				GameRegistry.addRecipe(new ItemStack(CraftSharp.factory.getBlock("ElectricFurnace")), "ABA", "BCB", "ABA",
-						'A', iron_ingot, 'B', stone, 'C', CraftSharp.factory.getItem("MachineCore"));
+				GameRegistry.addRecipe(new ItemStack(CraftSharp.factory.getBlock("ElectricFurnace")), "ABA", "BCB",
+						"ABA", 'A', iron_ingot, 'B', stone, 'C', CraftSharp.factory.getItem("MachineCore"));
 			}
 		});
-		
+
 		initializeSpecialIcons();
 		setParticleColor(ParticleColor.BLACK);
 	}
@@ -76,12 +76,16 @@ public class BlockElectricFurnace extends ElectricMachine {
 			setUpgradeSlots(new int[] { 2, 3 });
 			setValidUpgrades(new MachineUpgrade[] { MachineUpgrade.ENERGY_EFFICIENCY, MachineUpgrade.SPEED });
 
-			@SuppressWarnings("unchecked")
-			Map<ItemStack, ItemStack> recipes = FurnaceRecipes.smelting().getSmeltingList();
-			for (Entry<ItemStack, ItemStack> entry : recipes.entrySet()) {
-				addRecipe(new DefaultMachineRecipe(entry.getKey(), entry.getValue(), 100, 800, 0));
-			}
-
+			RecipeHandler.FUTURES.add(new Runnable() {
+				@Override
+				public void run() {
+					@SuppressWarnings("unchecked")
+					Map<ItemStack, ItemStack> recipes = FurnaceRecipes.smelting().getSmeltingList();
+					for (Entry<ItemStack, ItemStack> entry : recipes.entrySet()) {
+						addRecipe(new DefaultMachineRecipe(entry.getKey(), entry.getValue(), 100, 800, 0));
+					}
+				}
+			});
 			setChangeMeta(true);
 
 			onUISet = new Runnable() {

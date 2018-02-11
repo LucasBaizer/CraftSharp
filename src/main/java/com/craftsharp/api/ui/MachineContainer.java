@@ -9,16 +9,19 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotFurnace;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 
 public class MachineContainer extends Container {
 	private MachineTileEntity tileEntity;
 	private InventoryPlayer inventory;
 	private int normalizer;
+	private World world;
 	private int firstUpgradeIndex = -1;
 
-	public MachineContainer(InventoryPlayer inventory, Machine block, MachineTileEntity tileEntity) {
+	public MachineContainer(InventoryPlayer inventory, World world, Machine block, MachineTileEntity tileEntity) {
 		this.tileEntity = tileEntity;
 		this.inventory = inventory;
+		this.setWorld(world);
 
 		block.drawTiles(this);
 	}
@@ -40,14 +43,14 @@ public class MachineContainer extends Container {
 	public Slot createOutputSlot(int index, int x, int y) {
 		return new SlotFurnace(inventory.player, tileEntity, index, x, normalize(y));
 	}
-	
+
 	public Slot createUpgradeSlot(int index, int x, int y) {
 		if (firstUpgradeIndex == -1) {
 			firstUpgradeIndex = index;
 		}
 		return new UpgradeSlot(index, x, normalize(y), index - firstUpgradeIndex);
 	}
-	
+
 	public class UpgradeSlot extends Slot {
 		private int offset;
 
@@ -60,8 +63,8 @@ public class MachineContainer extends Container {
 		public boolean isItemValid(ItemStack stack) {
 			for (int s : tileEntity.itemSlots) {
 				if (s == getSlotIndex()) {
-					return stack.getItem() instanceof CraftSharpItemUpgrade
-							&& ((CraftSharpItemUpgrade) stack.getItem()).getUpgrade() == tileEntity.validUpgrades[offset];
+					return stack.getItem() instanceof CraftSharpItemUpgrade && ((CraftSharpItemUpgrade) stack.getItem())
+							.getUpgrade() == tileEntity.validUpgrades[offset];
 				}
 			}
 			return false;
@@ -154,5 +157,13 @@ public class MachineContainer extends Container {
 
 	public void setNormalizer(int normalizer) {
 		this.normalizer = normalizer;
+	}
+
+	public World getWorld() {
+		return world;
+	}
+
+	public void setWorld(World world) {
+		this.world = world;
 	}
 }

@@ -33,6 +33,10 @@ public class GameFactory {
 		return item;
 	}
 
+	public boolean hasItem(String name) {
+		return objects.containsKey(name);
+	}
+
 	private void printStackTrace(int frames) {
 		System.out.println("Current stacktrace (to " + frames + " frames): ");
 		StackTraceElement[] stack = Thread.currentThread().getStackTrace();

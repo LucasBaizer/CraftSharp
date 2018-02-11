@@ -145,10 +145,7 @@ public class CommonProxy {
 		registerMachine(new BlockGaseousInfuser(factory));
 		registerMachine(new BlockAirCompressor(factory));
 		registerMachine(new BlockRefrigerantCompressor(factory));
-
-		registerMachine(new BlockGaseousInfuser(factory));
-		registerMachine(new BlockAirCompressor(factory));
-		registerMachine(new BlockRefrigerantCompressor(factory));
+		registerMachine(new BlockUncrafter(factory));
 
 		DictionaryHandler.initialize(factory);
 		RecipeHandler.initialize(factory);
